@@ -8,9 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import queue_san_antonio.queues.models.EstadisticaTurno;
-import queue_san_antonio.queues.models.Sector;
-import queue_san_antonio.queues.models.Empleado;
+import queue_san_antonio.queues.models.*;
+import queue_san_antonio.queues.repositories.TurnoRepository;
 import queue_san_antonio.queues.services.EstadisticaTurnoService;
 import queue_san_antonio.queues.services.SectorService;
 import queue_san_antonio.queues.services.EmpleadoService;
@@ -19,9 +18,11 @@ import queue_san_antonio.queues.web.dto.estadistica.*;
 import queue_san_antonio.queues.web.dto.mapper.EstadisticaTurnoMapper;
 import queue_san_antonio.queues.web.exceptions.custom.ResourceNotFoundException;
 
+import java.time.Duration;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 //Controlador REST para la gestión de estadísticas de turnos
 //Proporciona endpoints para consultas y reportes estadísticos
@@ -30,12 +31,13 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Validated
-@PreAuthorize("hasAnyRole('RESPONSABLE', 'ADMINISTRADOR')")
+@PreAuthorize("hasAnyRole('RESPONSABLE_SECTOR', 'ADMIN')")
 public class EstadisticaTurnoController {
 
     private final EstadisticaTurnoService estadisticaTurnoService;
     private final SectorService sectorService;
     private final EmpleadoService empleadoService;
+    private final TurnoRepository turnoRepository;
 
     // ==========================================
     // ENDPOINTS DE ESTADÍSTICAS DIARIAS
@@ -528,4 +530,292 @@ public class EstadisticaTurnoController {
 
         return obtenerResumenDiario(LocalDate.now());
     }
+
+
+
+
+
+
+
+
+
+
+
+
+//    //Calcula estadísticas reales desde los turnos (TEMPORAL para testing)
+//    //POST /api/estadisticas/calcular/fecha/{fecha}
+    @PostMapping("/calcular/fecha/{fecha}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponseWrapper<String>> calcularEstadisticasReales(
+            @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fecha) {
+
+        log.info("Calculando estadísticas reales desde turnos para fecha: {}", fecha);
+
+        try {
+            // Obtener todos los turnos del día
+            LocalDateTime inicioDelDia = fecha.atStartOfDay();
+            LocalDateTime finDelDia = fecha.atTime(23, 59, 59);
+
+            List<Turno> turnosDelDia = turnoRepository.findTurnosDelDia(inicioDelDia, finDelDia);
+
+            log.info("Encontrados {} turnos para fecha {}", turnosDelDia.size(), fecha);
+
+            // Agrupar turnos por sector
+            Map<Long, List<Turno>> turnosPorSector = turnosDelDia.stream()
+                    .collect(Collectors.groupingBy(turno -> turno.getSector().getId()));
+
+            int sectoresActualizados = 0;
+
+            // Calcular estadísticas para cada sector
+            for (Map.Entry<Long, List<Turno>> entry : turnosPorSector.entrySet()) {
+                Long sectorId = entry.getKey();
+                List<Turno> turnosSector = entry.getValue();
+
+                // Obtener o crear estadística
+                EstadisticaTurno estadistica = estadisticaTurnoService.obtenerEstadisticaDelDia(sectorId, fecha);
+
+                // Contar por estado
+                int generados = (int) turnosSector.stream().filter(t -> t.getEstado() == EstadoTurno.GENERADO).count();
+                int llamados = (int) turnosSector.stream().filter(t -> t.getEstado() == EstadoTurno.LLAMADO).count();
+                int enAtencion = (int) turnosSector.stream().filter(t -> t.getEstado() == EstadoTurno.EN_ATENCION).count();
+                int finalizados = (int) turnosSector.stream().filter(t -> t.getEstado() == EstadoTurno.FINALIZADO).count();
+                int ausentes = (int) turnosSector.stream().filter(t -> t.getEstado() == EstadoTurno.AUSENTE).count();
+                int cancelados = (int) turnosSector.stream().filter(t -> t.getEstado() == EstadoTurno.CANCELADO).count();
+                int redirigidos = (int) turnosSector.stream().filter(t -> t.getEstado() == EstadoTurno.REDIRIGIDO).count();
+
+                // Calcular totales
+                int totalGenerados = generados + llamados + enAtencion + finalizados + ausentes + cancelados + redirigidos;
+                int totalAtendidos = finalizados + enAtencion; // Los que fueron atendidos
+
+                // Actualizar estadística (con validación de nulos y negativos)
+                estadistica.setTurnosGenerados(Math.max(0, totalGenerados));
+                estadistica.setTurnosAtendidos(Math.max(0, totalAtendidos));
+                estadistica.setTurnosAusentes(Math.max(0, ausentes));
+                estadistica.setTurnosCancelados(Math.max(0, cancelados));
+                estadistica.setTurnosRedirigidos(Math.max(0, redirigidos));
+
+                // Calcular tiempos promedio (asegurar que no sean negativos ni null)
+                OptionalDouble tiempoPromedioEspera = turnosSector.stream()
+                        .filter(t -> t.getFechaHoraLlamado() != null && t.getFechaHoraGeneracion() != null)
+                        .mapToLong(t -> Duration.between(t.getFechaHoraGeneracion(), t.getFechaHoraLlamado()).toMinutes())
+                        .filter(tiempo -> tiempo >= 0) // Filtrar tiempos negativos
+                        .average();
+
+                if (tiempoPromedioEspera.isPresent()) {
+                    int tiempoEspera = Math.max(0, (int) Math.round(tiempoPromedioEspera.getAsDouble()));
+                    estadistica.setTiempoPromedioEspera(tiempoEspera);
+                } else {
+                    estadistica.setTiempoPromedioEspera(0); // Valor por defecto seguro
+                }
+
+                OptionalDouble tiempoPromedioAtencion = turnosSector.stream()
+                        .filter(t -> t.getFechaHoraAtencion() != null && t.getFechaHoraFinalizacion() != null)
+                        .mapToLong(t -> Duration.between(t.getFechaHoraAtencion(), t.getFechaHoraFinalizacion()).toMinutes())
+                        .filter(tiempo -> tiempo >= 0) // Filtrar tiempos negativos
+                        .average();
+
+                if (tiempoPromedioAtencion.isPresent()) {
+                    int tiempoAtencion = Math.max(0, (int) Math.round(tiempoPromedioAtencion.getAsDouble()));
+                    estadistica.setTiempoPromedioAtencion(tiempoAtencion);
+                } else {
+                    estadistica.setTiempoPromedioAtencion(0); // Valor por defecto seguro
+                }
+
+                // Asegurar que otros campos requeridos no sean null
+                if (estadistica.getTiempoTotalAtencion() == null) {
+                    estadistica.setTiempoTotalAtencion(0);
+                }
+                if (estadistica.getCantidadPico() == null) {
+                    estadistica.setCantidadPico(0);
+                }
+
+                // Guardar estadística actualizada
+                estadisticaTurnoService.guardar(estadistica);
+                sectoresActualizados++;
+
+                log.info("Sector {}: {} turnos, {} atendidos",
+                        estadistica.getSector().getCodigo(), totalGenerados, totalAtendidos);
+            }
+
+            // ✅ TAMBIÉN GENERAR ESTADÍSTICAS POR EMPLEADO
+            Map<String, List<Turno>> turnosPorEmpleado = turnosDelDia.stream()
+                    .filter(turno -> turno.getEmpleadoAtencion() != null) // Solo turnos con empleado asignado
+                    .collect(Collectors.groupingBy(turno ->
+                            turno.getSector().getId() + "-" + turno.getEmpleadoAtencion().getId()
+                    ));
+
+            int empleadosActualizados = 0;
+
+            for (Map.Entry<String, List<Turno>> entry : turnosPorEmpleado.entrySet()) {
+                List<Turno> turnosEmpleado = entry.getValue();
+
+                if (turnosEmpleado.isEmpty()) continue;
+
+                Turno primerTurno = turnosEmpleado.get(0);
+                Long sectorId = primerTurno.getSector().getId();
+                Long empleadoId = primerTurno.getEmpleadoAtencion().getId();
+
+                // Obtener o crear estadística del empleado
+                EstadisticaTurno estadisticaEmpleado = estadisticaTurnoService.obtenerEstadisticaEmpleado(empleadoId, sectorId, fecha);
+
+                // Contar turnos por estado para este empleado
+                int generados = (int) turnosEmpleado.stream().filter(t -> t.getEstado() == EstadoTurno.GENERADO).count();
+                int llamados = (int) turnosEmpleado.stream().filter(t -> t.getEstado() == EstadoTurno.LLAMADO).count();
+                int enAtencion = (int) turnosEmpleado.stream().filter(t -> t.getEstado() == EstadoTurno.EN_ATENCION).count();
+                int finalizados = (int) turnosEmpleado.stream().filter(t -> t.getEstado() == EstadoTurno.FINALIZADO).count();
+                int ausentes = (int) turnosEmpleado.stream().filter(t -> t.getEstado() == EstadoTurno.AUSENTE).count();
+                int cancelados = (int) turnosEmpleado.stream().filter(t -> t.getEstado() == EstadoTurno.CANCELADO).count();
+                int redirigidos = (int) turnosEmpleado.stream().filter(t -> t.getEstado() == EstadoTurno.REDIRIGIDO).count();
+
+                int totalGenerados = generados + llamados + enAtencion + finalizados + ausentes + cancelados + redirigidos;
+                int totalAtendidos = finalizados + enAtencion;
+
+                // Actualizar estadística del empleado
+                estadisticaEmpleado.setTurnosGenerados(Math.max(0, totalGenerados));
+                estadisticaEmpleado.setTurnosAtendidos(Math.max(0, totalAtendidos));
+                estadisticaEmpleado.setTurnosAusentes(Math.max(0, ausentes));
+                estadisticaEmpleado.setTurnosCancelados(Math.max(0, cancelados));
+                estadisticaEmpleado.setTurnosRedirigidos(Math.max(0, redirigidos));
+
+                // Campos requeridos
+                if (estadisticaEmpleado.getTiempoTotalAtencion() == null) {
+                    estadisticaEmpleado.setTiempoTotalAtencion(0);
+                }
+                if (estadisticaEmpleado.getCantidadPico() == null) {
+                    estadisticaEmpleado.setCantidadPico(0);
+                }
+
+                estadisticaTurnoService.guardar(estadisticaEmpleado);
+                empleadosActualizados++;
+
+                log.info("Estadística empleado {}: {} turnos, {} atendidos",
+                        estadisticaEmpleado.getEmpleado().getUsername(), totalGenerados, totalAtendidos);
+            }
+
+            String mensaje = String.format("Estadísticas calculadas: %d sectores, %d empleados, %d turnos procesados",
+                    sectoresActualizados, empleadosActualizados, turnosDelDia.size());
+
+            log.info("Cálculo de estadísticas completado: {}", mensaje);
+
+            return ResponseEntity.ok(
+                    ApiResponseWrapper.success("OK", mensaje)
+            );
+
+        } catch (Exception e) {
+            log.error("Error al calcular estadísticas reales para fecha {}", fecha, e);
+            return ResponseEntity.status(500).body(
+                    ApiResponseWrapper.error("Error interno al calcular estadísticas", "CALCULATION_ERROR")
+            );
+        }
+    }
+
+
+//    //Debug: Lista todos los turnos en la base de datos (TEMPORAL)
+//    //GET /api/estadisticas/debug/turnos
+    @GetMapping("/debug/turnos")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponseWrapper<Object>> debugTurnos() {
+
+        log.info("DEBUG: Listando todos los turnos en la base de datos");
+
+        try {
+            List<Turno> todosTurnos = turnoRepository.findAll();
+
+            // Crear una respuesta simple con información clave
+            List<Map<String, Object>> turnosInfo = todosTurnos.stream()
+                    .map(turno -> {
+                        Map<String, Object> info = new HashMap<>();
+                        info.put("id", turno.getId());
+                        info.put("codigo", turno.getCodigo());
+                        info.put("sector", turno.getSector().getCodigo());
+                        info.put("estado", turno.getEstado().name());
+                        info.put("fechaHoraGeneracion", turno.getFechaHoraGeneracion());
+                        info.put("fechaCita", turno.getFechaCita());
+                        info.put("horaCita", turno.getHoraCita());
+                        info.put("ciudadanoDni", turno.getCiudadano().getDni());
+                        return info;
+                    })
+                    .collect(Collectors.toList());
+
+            log.info("DEBUG: Total turnos encontrados: {}", todosTurnos.size());
+
+            // Agrupar por fecha de generación
+            Map<String, List<Map<String, Object>>> turnosPorFecha = turnosInfo.stream()
+                    .collect(Collectors.groupingBy(info -> {
+                        LocalDateTime fechaGen = (LocalDateTime) info.get("fechaHoraGeneracion");
+                        return fechaGen != null ? fechaGen.toLocalDate().toString() : "SIN_FECHA";
+                    }));
+
+            Map<String, Object> respuesta = new HashMap<>();
+            respuesta.put("totalTurnos", todosTurnos.size());
+            respuesta.put("turnosPorFecha", turnosPorFecha);
+            respuesta.put("fechaActual", LocalDate.now().toString());
+
+            return ResponseEntity.ok(
+                    ApiResponseWrapper.success(respuesta,
+                            String.format("Debug: %d turnos encontrados", todosTurnos.size()))
+            );
+
+        } catch (Exception e) {
+            log.error("Error en debug de turnos", e);
+            return ResponseEntity.status(500).body(
+                    ApiResponseWrapper.error("Error en debug", "DEBUG_ERROR")
+            );
+        }
+    }
+//
+//    //Debug: Prueba query específica de turnos del día
+////GET /api/estadisticas/debug/turnos-dia/{fecha}
+//    @GetMapping("/debug/turnos-dia/{fecha}")
+//    @PreAuthorize("hasRole('ADMINISTRADOR')")
+//    public ResponseEntity<ApiResponseWrapper<Object>> debugTurnosDelDia(
+//            @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fecha) {
+//
+//        log.info("DEBUG: Buscando turnos para fecha: {}", fecha);
+//
+//        try {
+//            LocalDateTime inicioDelDia = fecha.atStartOfDay();
+//            LocalDateTime finDelDia = fecha.atTime(23, 59, 59);
+//
+//            log.info("DEBUG: Rango de búsqueda: {} a {}", inicioDelDia, finDelDia);
+//
+//            List<Turno> turnosDelDia = turnoRepository.findTurnosDelDia(inicioDelDia, finDelDia);
+//
+//            log.info("DEBUG: Turnos encontrados: {}", turnosDelDia.size());
+//
+//            List<Map<String, Object>> turnosInfo = turnosDelDia.stream()
+//                    .map(turno -> {
+//                        Map<String, Object> info = new HashMap<>();
+//                        info.put("codigo", turno.getCodigo());
+//                        info.put("sector", turno.getSector().getCodigo());
+//                        info.put("estado", turno.getEstado().name());
+//                        info.put("fechaHoraGeneracion", turno.getFechaHoraGeneracion());
+//                        info.put("ciudadanoDni", turno.getCiudadano().getDni());
+//                        return info;
+//                    })
+//                    .collect(Collectors.toList());
+//
+//            Map<String, Object> respuesta = new HashMap<>();
+//            respuesta.put("fecha", fecha.toString());
+//            respuesta.put("inicioRango", inicioDelDia.toString());
+//            respuesta.put("finRango", finDelDia.toString());
+//            respuesta.put("turnosEncontrados", turnosDelDia.size());
+//            respuesta.put("turnos", turnosInfo);
+//
+//            return ResponseEntity.ok(
+//                    ApiResponseWrapper.success(respuesta,
+//                            String.format("Debug: %d turnos para fecha %s", turnosDelDia.size(), fecha))
+//            );
+//
+//        } catch (Exception e) {
+//            log.error("Error en debug de turnos del día {}", fecha, e);
+//            return ResponseEntity.status(500).body(
+//                    ApiResponseWrapper.error("Error en debug", "DEBUG_ERROR")
+//            );
+//        }
+//    }
+
+
+
+
 }

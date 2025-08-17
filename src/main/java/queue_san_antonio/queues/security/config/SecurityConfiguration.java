@@ -55,7 +55,8 @@ public class SecurityConfiguration {
                         // Endpoints públicos - NO requieren autenticación
                         .requestMatchers("/api/auth/login", "/api/auth/refresh",
                                 "/api/sectores/publicos", "/api/sectores/especiales",
-                                "api/configuraciones-pantalla/activa").permitAll()
+                                "api/configuraciones-pantalla/activa",
+                                "api/mensajes-institucionales/vigentes", "api/mensajes-institucionales/configuracion/{configuracionId}").permitAll()
                         .requestMatchers("/api/pantalla/**").permitAll()
                         .requestMatchers("/api/turnos/consulta/**").permitAll()
 

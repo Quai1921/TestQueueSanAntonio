@@ -81,7 +81,7 @@ public class MensajeInstitucionalController {
     //Obtiene un mensaje específico por ID
     //GET /api/mensajes-institucionales/{id}
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponseWrapper<MensajeInstitucionalResponse>> obtenerPorId(@PathVariable Long id) {
 
         log.debug("Obteniendo mensaje institucional ID: {}", id);
@@ -99,7 +99,7 @@ public class MensajeInstitucionalController {
     //Lista todos los mensajes de una configuración (vista administrativa)
     //GET /api/mensajes-institucionales/admin/configuracion/{configuracionId}
     @GetMapping("/admin/configuracion/{configuracionId}")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponseWrapper<List<MensajeInstitucionalResponse>>> listarTodosPorConfiguracion(
             @PathVariable Long configuracionId) {
 
@@ -127,7 +127,7 @@ public class MensajeInstitucionalController {
     //Crea un nuevo mensaje institucional
     //POST /api/mensajes-institucionales/configuracion/{configuracionId}
     @PostMapping("/configuracion/{configuracionId}")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponseWrapper<MensajeInstitucionalResponse>> crearMensaje(
             @PathVariable Long configuracionId,
             @Valid @RequestBody MensajeInstitucionalRequest request) {
@@ -182,7 +182,7 @@ public class MensajeInstitucionalController {
     //Activa un mensaje
     //PUT /api/mensajes-institucionales/{id}/activar
     @PutMapping("/{id}/activar")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponseWrapper<MensajeInstitucionalResponse>> activarMensaje(@PathVariable Long id) {
 
         log.info("Activando mensaje institucional ID: {}", id);
@@ -204,7 +204,7 @@ public class MensajeInstitucionalController {
     //Desactiva un mensaje
     //PUT /api/mensajes-institucionales/{id}/desactivar
     @PutMapping("/{id}/desactivar")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponseWrapper<MensajeInstitucionalResponse>> desactivarMensaje(@PathVariable Long id) {
 
         log.info("Desactivando mensaje institucional ID: {}", id);
@@ -226,7 +226,7 @@ public class MensajeInstitucionalController {
     //Establece la vigencia de un mensaje
     //PUT /api/mensajes-institucionales/{id}/vigencia
     @PutMapping("/{id}/vigencia")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponseWrapper<MensajeInstitucionalResponse>> establecerVigencia(
             @PathVariable Long id,
             @Valid @RequestBody EstablecerVigenciaRequest request) {
@@ -268,7 +268,7 @@ public class MensajeInstitucionalController {
     //Elimina un mensaje institucional
     //DELETE /api/mensajes-institucionales/{id}
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponseWrapper<String>> eliminarMensaje(@PathVariable Long id) {
 
         log.info("Eliminando mensaje institucional ID: {}", id);

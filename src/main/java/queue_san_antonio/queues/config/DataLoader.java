@@ -11,6 +11,7 @@ import queue_san_antonio.queues.repositories.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 /**
  * Carga datos de prueba al iniciar la aplicación
@@ -625,32 +626,100 @@ public class DataLoader implements CommandLineRunner {
         turnoRepository.save(turno);
     }
 
+//    private void crearTurnoEnAtencion(Sector sector, Ciudadano ciudadano, LocalDate fecha, LocalTime hora,
+//                                      TipoTurno tipo, Integer prioridad) {
+//        String codigo = generarCodigoTurno(sector);
+//
+//        Turno turno = Turno.builder()
+//                .codigo(codigo)
+//                .sector(sector)
+//                .ciudadano(ciudadano)
+//                .estado(EstadoTurno.EN_ATENCION)
+//                .tipo(tipo)
+//                .prioridad(prioridad)
+//                .observaciones("Turno de prueba en atención")
+//                .build();
+//
+//        // Simular flujo completo: generado -> llamado -> en atención
+//        LocalDateTime fechaGeneracion = fecha.atTime(hora);
+//        turno.setFechaHoraGeneracion(fechaGeneracion);
+//        turno.setFechaHoraLlamado(fechaGeneracion.plusMinutes(5));
+//        turno.setFechaHoraAtencion(fechaGeneracion.plusMinutes(10));
+//
+//        turnoRepository.save(turno);
+//    }
+
     private void crearTurnoEnAtencion(Sector sector, Ciudadano ciudadano, LocalDate fecha, LocalTime hora,
-                                      TipoTurno tipo, Integer prioridad) {
-        String codigo = generarCodigoTurno(sector);
+                                  TipoTurno tipo, Integer prioridad) {
+    String codigo = generarCodigoTurno(sector);
 
-        Turno turno = Turno.builder()
-                .codigo(codigo)
-                .sector(sector)
-                .ciudadano(ciudadano)
-                .estado(EstadoTurno.EN_ATENCION)
-                .tipo(tipo)
-                .prioridad(prioridad)
-                .observaciones("Turno de prueba en atención")
-                .build();
+    // ✅ BUSCAR UN OPERADOR DEL SECTOR
+    List<Empleado> operadores = empleadoRepository.findBySectorIdAndActivoTrue(sector.getId())
+            .stream()
+            .filter(emp -> emp.getRol() == RolEmpleado.OPERADOR)
+            .toList();
 
-        // Simular flujo completo: generado -> llamado -> en atención
-        LocalDateTime fechaGeneracion = fecha.atTime(hora);
-        turno.setFechaHoraGeneracion(fechaGeneracion);
-        turno.setFechaHoraLlamado(fechaGeneracion.plusMinutes(5));
-        turno.setFechaHoraAtencion(fechaGeneracion.plusMinutes(10));
+    Empleado empleadoAsignado = !operadores.isEmpty() ? operadores.get(0) : null;
 
-        turnoRepository.save(turno);
-    }
+    Turno turno = Turno.builder()
+            .codigo(codigo)
+            .sector(sector)
+            .ciudadano(ciudadano)
+            .estado(EstadoTurno.EN_ATENCION)
+            .tipo(tipo)
+            .prioridad(prioridad)
+            .empleadoAtencion(empleadoAsignado)  // ✅ ASIGNAR EMPLEADO
+            .observaciones("Turno de prueba en atención")
+            .build();
+
+    // Simular flujo completo: generado -> llamado -> en atención
+    LocalDateTime fechaGeneracion = fecha.atTime(hora);
+    turno.setFechaHoraGeneracion(fechaGeneracion);
+    turno.setFechaHoraLlamado(fechaGeneracion.plusMinutes(5));
+    turno.setFechaHoraAtencion(fechaGeneracion.plusMinutes(10));
+
+        // ✅ LOG PARA DEBUG
+        log.info("Turno EN_ATENCION creado: {} - Empleado: {}",
+                codigo, empleadoAsignado != null ? empleadoAsignado.getUsername() : "NULL");
+
+    turnoRepository.save(turno);
+}
+
+//    private void crearTurnoFinalizado(Sector sector, Ciudadano ciudadano, LocalDate fecha, LocalTime hora,
+//                                      TipoTurno tipo, Integer prioridad) {
+//        String codigo = generarCodigoTurno(sector);
+//
+//        Turno turno = Turno.builder()
+//                .codigo(codigo)
+//                .sector(sector)
+//                .ciudadano(ciudadano)
+//                .estado(EstadoTurno.FINALIZADO)
+//                .tipo(tipo)
+//                .prioridad(prioridad)
+//                .observaciones("Turno de prueba finalizado")
+//                .build();
+//
+//        // Simular flujo completo: generado -> llamado -> en atención -> finalizado
+//        LocalDateTime fechaGeneracion = fecha.atTime(hora);
+//        turno.setFechaHoraGeneracion(fechaGeneracion);
+//        turno.setFechaHoraLlamado(fechaGeneracion.plusMinutes(5));
+//        turno.setFechaHoraAtencion(fechaGeneracion.plusMinutes(10));
+//        turno.setFechaHoraFinalizacion(fechaGeneracion.plusMinutes(10 + sector.getTiempoEstimadoAtencion()));
+//
+//        turnoRepository.save(turno);
+//    }
 
     private void crearTurnoFinalizado(Sector sector, Ciudadano ciudadano, LocalDate fecha, LocalTime hora,
                                       TipoTurno tipo, Integer prioridad) {
         String codigo = generarCodigoTurno(sector);
+
+        // ✅ BUSCAR UN OPERADOR DEL SECTOR
+        List<Empleado> operadores = empleadoRepository.findBySectorIdAndActivoTrue(sector.getId())
+                .stream()
+                .filter(emp -> emp.getRol() == RolEmpleado.OPERADOR)
+                .toList();
+
+        Empleado empleadoAsignado = !operadores.isEmpty() ? operadores.get(0) : null;
 
         Turno turno = Turno.builder()
                 .codigo(codigo)
@@ -659,6 +728,7 @@ public class DataLoader implements CommandLineRunner {
                 .estado(EstadoTurno.FINALIZADO)
                 .tipo(tipo)
                 .prioridad(prioridad)
+                .empleadoAtencion(empleadoAsignado)  // ✅ ASIGNAR EMPLEADO
                 .observaciones("Turno de prueba finalizado")
                 .build();
 
@@ -671,6 +741,25 @@ public class DataLoader implements CommandLineRunner {
 
         turnoRepository.save(turno);
     }
+
+//    private void crearTurnoCitaPrevia(Sector sector, Ciudadano ciudadano, LocalDate fecha, LocalTime hora) {
+//        String codigo = generarCodigoTurno(sector);
+//
+//        Turno turno = Turno.builder()
+//                .codigo(codigo)
+//                .sector(sector)
+//                .ciudadano(ciudadano)
+//                .estado(EstadoTurno.GENERADO)
+//                .tipo(TipoTurno.ESPECIAL)
+//                .prioridad(0)
+//                .fechaCita(fecha)
+//                .horaCita(hora)
+//                .observaciones("Cita previa programada")
+//                .build();
+//
+//        turnoRepository.save(turno);
+//    }
+
 
     private void crearTurnoCitaPrevia(Sector sector, Ciudadano ciudadano, LocalDate fecha, LocalTime hora) {
         String codigo = generarCodigoTurno(sector);
@@ -686,6 +775,9 @@ public class DataLoader implements CommandLineRunner {
                 .horaCita(hora)
                 .observaciones("Cita previa programada")
                 .build();
+
+        // ✅ ESTABLECER FECHA DE GENERACIÓN (antes faltaba esto)
+        turno.setFechaHoraGeneracion(LocalDate.now().atTime(8, 0)); // Generada hoy temprano
 
         turnoRepository.save(turno);
     }
