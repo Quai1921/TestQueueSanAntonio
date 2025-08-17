@@ -187,7 +187,7 @@ public class SectorController {
         List<HorarioAtencion> horarios = horarioAtencionService.listarPorSector(id);
 
         SectorResponse sectorResponse = SectorMapper.toResponse(sector);
-        List<HorarioAtencionResponse> horariosResponse = HorarioAtencionMapper.toSummaryResponseList(horarios);
+        List<HorarioAtencionResponse> horariosResponse = HorarioAtencionMapper.toResponseList(horarios);
 
         SectorConHorariosResponse response = SectorConHorariosResponse.builder()
                 .sector(sectorResponse)

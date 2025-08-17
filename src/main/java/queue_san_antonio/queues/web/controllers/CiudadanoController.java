@@ -41,7 +41,7 @@ public class CiudadanoController {
     //Busca un ciudadano por DNI
     //GET /api/ciudadanos/dni/{dni}
     @GetMapping("/dni/{dni}")
-    @PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('OPERADOR', 'RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<CiudadanoResponse>> buscarPorDni(
             @PathVariable
             @Pattern(regexp = "^[0-9]{7,8}$", message = "El DNI debe tener entre 7 y 8 dígitos")
@@ -69,7 +69,7 @@ public class CiudadanoController {
     //Busca ciudadanos por DNI o apellido (para formularios)
     //GET /api/ciudadanos/search?dni={dni}&apellido={apellido}
     @GetMapping("/search")
-    @PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('OPERADOR', 'RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<List<CiudadanoSummaryResponse>>> buscarCiudadanos(
             @RequestParam(required = false)
             @Pattern(regexp = "^[0-9]{7,8}$", message = "El DNI debe tener entre 7 y 8 dígitos")
@@ -124,7 +124,7 @@ public class CiudadanoController {
     //Verifica si existe un ciudadano por DNI
     //GET /api/ciudadanos/existe/{dni}
     @GetMapping("/existe/{dni}")
-    @PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('OPERADOR', 'RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<Boolean>> existeCiudadano(
             @PathVariable
             @Pattern(regexp = "^[0-9]{7,8}$", message = "El DNI debe tener entre 7 y 8 dígitos")
@@ -140,16 +140,46 @@ public class CiudadanoController {
         );
     }
 
+    //Lista todos los ciudadanos (ordenados por apellido)
+    //GET /api/ciudadanos
+    @GetMapping
+    @PreAuthorize("hasAnyRole('OPERADOR', 'RESPONSABLE_SECTOR', 'ADMIN')")
+    public ResponseEntity<ApiResponseWrapper<List<CiudadanoSummaryResponse>>> listarTodos() {
+
+        log.debug("Listando todos los ciudadanos");
+
+        List<Ciudadano> ciudadanos = ciudadanoService.listarTodos();
+        List<CiudadanoSummaryResponse> response = CiudadanoMapper.toSummaryResponseList(ciudadanos);
+
+        // Agregar información de turnos pendientes para cada ciudadano
+        response.forEach(ciudadanoResponse -> {
+            Optional<Ciudadano> ciudadanoEntity = ciudadanos.stream()
+                    .filter(c -> c.getDni().equals(ciudadanoResponse.getDni()))
+                    .findFirst();
+
+            if (ciudadanoEntity.isPresent()) {
+                boolean tieneTurnoPendiente = turnoService.ciudadanoTieneTurnoPendiente(ciudadanoEntity.get().getId());
+                ciudadanoResponse.setTieneTurnoPendiente(tieneTurnoPendiente);
+            }
+        });
+
+        return ResponseEntity.ok(
+                ApiResponseWrapper.success(response,
+                        String.format("Se encontraron %d ciudadanos", ciudadanos.size()))
+        );
+    }
+
+
+
+
     // ==========================================
     // ENDPOINTS DE CREACIÓN Y ACTUALIZACIÓN
     // ==========================================
 
-    /**
-     * Crea un nuevo ciudadano
-     * POST /api/ciudadanos
-     */
+    //Crea un nuevo ciudadano
+    //POST /api/ciudadanos
     @PostMapping
-    @PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('OPERADOR', 'RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<CiudadanoResponse>> crearCiudadano(
             @Valid @RequestBody CiudadanoRequest request) {
 
@@ -179,7 +209,7 @@ public class CiudadanoController {
     //Actualiza un ciudadano existente
     //PUT /api/ciudadanos/{dni}
     @PutMapping("/{dni}")
-    @PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('OPERADOR', 'RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<CiudadanoResponse>> actualizarCiudadano(
             @PathVariable
             @Pattern(regexp = "^[0-9]{7,8}$", message = "El DNI debe tener entre 7 y 8 dígitos")
@@ -215,7 +245,7 @@ public class CiudadanoController {
     //Crea o actualiza un ciudadano (método helper para generar turnos)
     //POST /api/ciudadanos/crear-o-actualizar
     @PostMapping("/crear-o-actualizar")
-    @PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('OPERADOR', 'RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<CiudadanoResponse>> crearOActualizarCiudadano(
             @Valid @RequestBody CiudadanoRequest request) {
 
@@ -262,7 +292,7 @@ public class CiudadanoController {
     //Establece o quita la prioridad de un ciudadano
     //PUT /api/ciudadanos/{dni}/prioridad
     @PutMapping("/{dni}/prioridad")
-    @PreAuthorize("hasAnyRole('RESPONSABLE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<CiudadanoResponse>> establecerPrioridad(
             @PathVariable
             @Pattern(regexp = "^[0-9]{7,8}$", message = "El DNI debe tener entre 7 y 8 dígitos")

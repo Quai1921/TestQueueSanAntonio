@@ -51,6 +51,15 @@ public class CiudadanoServiceImpl implements CiudadanoService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<Ciudadano> listarTodos() {
+        log.debug("Listando todos los ciudadanos");
+
+        // Ordenar por apellido, luego por nombre para mejor UX
+        return ciudadanoRepository.findAllByOrderByApellidoAscNombreAsc();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<Ciudadano> buscarPorDniOApellido(String dni, String apellido) {
         if ((dni == null || dni.trim().isEmpty()) &&
                 (apellido == null || apellido.trim().isEmpty())) {

@@ -11,6 +11,7 @@ public interface CiudadanoService {
     Ciudadano guardar(Ciudadano ciudadano);
     Optional<Ciudadano> buscarPorId(Long id);
     Optional<Ciudadano> buscarPorDni(String dni);
+    List<Ciudadano> listarTodos();
 
     // Búsquedas para formulario de turno
     List<Ciudadano> buscarPorDniOApellido(String dni, String apellido);

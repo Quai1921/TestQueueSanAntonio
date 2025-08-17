@@ -19,11 +19,13 @@ public interface CiudadanoRepository extends JpaRepository<Ciudadano, Long> {
     List<Ciudadano> findByApellidoContainingIgnoreCase(String apellido);
 
     // Búsqueda por DNI o apellido (para el formulario de turno)
-    @Query("SELECT c FROM Ciudadano c WHERE c.dni = :dni OR LOWER(c.apellido) LIKE LOWER(CONCAT('%', :apellido, '%'))")
+    @Query("SELECT c FROM Ciudadano c WHERE " + "(:dni IS NULL OR :dni = '' OR c.dni = :dni) AND " + "(:apellido IS NULL OR :apellido = '' OR LOWER(c.apellido) LIKE LOWER(CONCAT('%', :apellido, '%')))")
     List<Ciudadano> findByDniOrApellido(@Param("dni") String dni, @Param("apellido") String apellido);
 
     // Verificar si DNI ya existe
     boolean existsByDni(String dni);
+
+    List<Ciudadano> findAllByOrderByApellidoAscNombreAsc();
 
 
 
