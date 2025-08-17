@@ -61,7 +61,7 @@ public class ConfiguracionPantallaController {
     //Lista todas las configuraciones
     //GET /api/configuraciones-pantalla
     @GetMapping
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponseWrapper<List<ConfiguracionPantallaSummaryResponse>>> listarTodas() {
 
         log.debug("Listando todas las configuraciones de pantalla");
@@ -79,7 +79,7 @@ public class ConfiguracionPantallaController {
     //Obtiene una configuración específica por ID
     //GET /api/configuraciones-pantalla/{id}
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponseWrapper<ConfiguracionPantallaResponse>> obtenerPorId(@PathVariable Long id) {
 
         log.debug("Obteniendo configuración de pantalla ID: {}", id);
@@ -101,7 +101,7 @@ public class ConfiguracionPantallaController {
     //Crea una nueva configuración de pantalla
     //POST /api/configuraciones-pantalla
     @PostMapping
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponseWrapper<ConfiguracionPantallaResponse>> crearConfiguracion(
             @Valid @RequestBody ConfiguracionPantallaRequest request) {
 
@@ -172,7 +172,7 @@ public class ConfiguracionPantallaController {
     //Actualiza una configuración existente
     //PUT /api/configuraciones-pantalla/{id}
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponseWrapper<ConfiguracionPantallaResponse>> actualizarConfiguracion(
             @PathVariable Long id,
             @Valid @RequestBody ConfiguracionPantallaRequest request) {
@@ -238,7 +238,7 @@ public class ConfiguracionPantallaController {
     //Activa una configuración (desactiva las demás)
     //PUT /api/configuraciones-pantalla/{id}/activar
     @PutMapping("/{id}/activar")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponseWrapper<ConfiguracionPantallaResponse>> activarConfiguracion(@PathVariable Long id) {
 
         log.info("Activando configuración de pantalla ID: {}", id);
@@ -265,7 +265,7 @@ public class ConfiguracionPantallaController {
     //Configura el sonido de una configuración
     //PUT /api/configuraciones-pantalla/{id}/sonido
     @PutMapping("/{id}/sonido")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponseWrapper<String>> configurarSonido(
             @PathVariable Long id,
             @Valid @RequestBody ConfigurarSonidoRequest request) {
@@ -293,7 +293,7 @@ public class ConfiguracionPantallaController {
     //Configura la apariencia de una configuración
     //PUT /api/configuraciones-pantalla/{id}/apariencia
     @PutMapping("/{id}/apariencia")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponseWrapper<String>> configurarApariencia(
             @PathVariable Long id,
             @Valid @RequestBody ConfigurarAparienciaRequest request) {

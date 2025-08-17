@@ -127,6 +127,7 @@ public class ConfiguracionPantallaServiceImpl implements ConfiguracionPantallaSe
         log.debug("Sonido configurado para {}: activo={}, volumen={}", configuracion.getNombre(), activo, volumen);
     }
 
+
     @Override
     public void configurarApariencia(Long configuracionId, String tema, Boolean mostrarLogo, String rutaLogo) {
         if (configuracionId == null) {
@@ -138,7 +139,14 @@ public class ConfiguracionPantallaServiceImpl implements ConfiguracionPantallaSe
         ConfiguracionPantalla configuracion = configuracionPantallaRepository.findById(configuracionId)
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró configuración con ID: " + configuracionId));
 
-        configuracion.configurarApariencia(null, tema, mostrarLogo, rutaLogo);
+        // MANTENER el valor actual de animaciones en lugar de pasarle null
+        configuracion.configurarApariencia(
+                configuracion.getAnimacionesActivas(), // <-- ESTO ES LO QUE HAY QUE CAMBIAR
+                tema,
+                mostrarLogo,
+                rutaLogo
+        );
+
         guardar(configuracion);
 
         log.debug("Apariencia configurada para {}: tema={}, mostrarLogo={}",

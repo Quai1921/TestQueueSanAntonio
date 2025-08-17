@@ -54,7 +54,8 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authz -> authz
                         // Endpoints públicos - NO requieren autenticación
                         .requestMatchers("/api/auth/login", "/api/auth/refresh",
-                                "/api/sectores/publicos", "/api/sectores/especiales").permitAll()
+                                "/api/sectores/publicos", "/api/sectores/especiales",
+                                "api/configuraciones-pantalla/activa").permitAll()
                         .requestMatchers("/api/pantalla/**").permitAll()
                         .requestMatchers("/api/turnos/consulta/**").permitAll()
 
