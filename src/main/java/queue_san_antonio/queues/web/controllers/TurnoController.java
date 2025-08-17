@@ -1,0 +1,488 @@
+package queue_san_antonio.queues.web.controllers;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import queue_san_antonio.queues.models.Ciudadano;
+import queue_san_antonio.queues.models.Sector;
+import queue_san_antonio.queues.models.Turno;
+import queue_san_antonio.queues.services.CiudadanoService;
+import queue_san_antonio.queues.services.SectorService;
+import queue_san_antonio.queues.services.TurnoService;
+import queue_san_antonio.queues.web.dto.common.ApiResponseWrapper;
+import queue_san_antonio.queues.web.dto.mapper.TurnoMapper;
+import queue_san_antonio.queues.web.dto.turno.FinalizarTurnoRequest;
+import queue_san_antonio.queues.web.dto.turno.GenerarTurnoRequest;
+import queue_san_antonio.queues.web.dto.turno.LlamarTurnoRequest;
+import queue_san_antonio.queues.web.dto.turno.MarcarAusenteRequest;
+import queue_san_antonio.queues.web.dto.turno.RedirigirTurnoRequest;
+import queue_san_antonio.queues.web.dto.turno.TurnoResponse;
+import queue_san_antonio.queues.web.dto.turno.TurnoSummaryResponse;
+import queue_san_antonio.queues.web.exceptions.custom.ResourceNotFoundException;
+
+import java.time.LocalDate;
+import java.util.List;
+
+//Controlador REST para la gestión completa de turnos
+//Incluye generación, consultas públicas y operaciones de empleados
+@RestController
+@RequestMapping("/api/turnos")
+@RequiredArgsConstructor
+@Slf4j
+@Validated
+public class TurnoController {
+
+    private final TurnoService turnoService;
+    private final CiudadanoService ciudadanoService;
+    private final SectorService sectorService;
+
+    // ==========================================
+    // ENDPOINTS PÚBLICOS (SIN AUTENTICACIÓN)
+    // ==========================================
+
+    //Consulta pública de turno por código
+    //GET /api/turnos/codigo/{codigo}
+    @GetMapping("/codigo/{codigo}")
+    public ResponseEntity<ApiResponseWrapper<TurnoResponse>> consultarTurnoPorCodigo(
+            @PathVariable
+            @Pattern(regexp = "^[A-Z]{2,10}[0-9]{3}$", message = "Código de turno inválido")
+            String codigo) {
+
+        log.debug("Consulta pública de turno por código: {}", codigo);
+
+        Turno turno = turnoService.buscarPorCodigo(codigo)
+                .orElseThrow(() -> ResourceNotFoundException.turno(codigo));
+
+        TurnoResponse response = TurnoMapper.toResponse(turno);
+
+        return ResponseEntity.ok(
+                ApiResponseWrapper.success(response, "Turno encontrado")
+        );
+    }
+
+    // ==========================================
+    // ENDPOINTS DE GENERACIÓN (EMPLEADOS)
+    // ==========================================
+
+    //Genera un turno (normal o especial según datos proporcionados)
+    //POST /api/turnos/generar
+    @PostMapping("/generar")
+    @PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+    public ResponseEntity<ApiResponseWrapper<TurnoResponse>> generarTurno(
+            @Valid @RequestBody GenerarTurnoRequest request,
+            Authentication authentication) {
+
+        String tipoTurno = request.esEspecial() ? "especial" : "normal";
+        String citaInfo = request.esEspecial() ?
+                String.format(" - Cita: %s %s", request.getFechaCita(), request.getHoraCita()) : "";
+
+        log.info("Generando turno {} para DNI: {} en sector: {}{}",
+                tipoTurno, request.getDni(), request.getSectorId(), citaInfo);
+
+        try {
+            Long empleadoId = obtenerEmpleadoIdDesdeAuth(authentication);
+
+            // Procesar ciudadano (crear o actualizar)
+            Ciudadano ciudadano = procesarCiudadano(request);
+
+            // Validaciones específicas para turnos especiales
+            if (request.esEspecial()) {
+                Sector sector = sectorService.buscarPorId(request.getSectorId())
+                        .orElseThrow(() -> ResourceNotFoundException.sector(request.getSectorId()));
+
+                if (!sector.esEspecial()) {
+                    return ResponseEntity.badRequest().body(
+                            ApiResponseWrapper.error("El sector no acepta turnos especiales con cita previa", "SECTOR_NOT_SPECIAL")
+                    );
+                }
+            }
+
+            // Generar turno según tipo
+            Turno turno;
+            if (request.esEspecial()) {
+                turno = turnoService.generarTurnoEspecial(
+                        ciudadano.getId(),
+                        request.getSectorId(),
+                        request.getFechaCita(),
+                        request.getHoraCita(),
+                        empleadoId
+                );
+            } else {
+                turno = turnoService.generarTurno(
+                        ciudadano.getId(),
+                        request.getSectorId(),
+                        request.getTipo(),
+                        empleadoId
+                );
+            }
+
+            TurnoResponse response = TurnoMapper.toResponse(turno);
+
+            String mensaje = request.esEspecial() ?
+                    String.format("Turno especial generado exitosamente con cita para %s a las %s",
+                            request.getFechaCita(), request.getHoraCita()) :
+                    "Turno generado exitosamente";
+
+            log.info("Turno {} generado exitosamente: {} para ciudadano {} en sector {}{}",
+                    tipoTurno, turno.getCodigo(), ciudadano.getDni(), turno.getSector().getCodigo(), citaInfo);
+
+            return ResponseEntity.ok(
+                    ApiResponseWrapper.success(response, mensaje)
+            );
+
+        } catch (IllegalArgumentException e) {
+            log.warn("Error en parámetros para generar turno {}: {}", tipoTurno, e.getMessage());
+            return ResponseEntity.badRequest().body(
+                    ApiResponseWrapper.error(e.getMessage(), "INVALID_PARAMETERS")
+            );
+        } catch (IllegalStateException e) {
+            log.warn("Error de estado para generar turno {}: {}", tipoTurno, e.getMessage());
+            return ResponseEntity.badRequest().body(
+                    ApiResponseWrapper.error(e.getMessage(), "INVALID_STATE")
+            );
+        }
+    }
+
+    // ==========================================
+    // ENDPOINTS DE CONSULTA (EMPLEADOS)
+    // ==========================================
+
+    //Busca un turno por ID
+    //GET /api/turnos/{id}
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+    public ResponseEntity<ApiResponseWrapper<TurnoResponse>> buscarTurnoPorId(@PathVariable Long id) {
+
+        log.debug("Buscando turno por ID: {}", id);
+
+        Turno turno = turnoService.buscarPorId(id)
+                .orElseThrow(() -> ResourceNotFoundException.turno(id));
+
+        TurnoResponse response = TurnoMapper.toResponse(turno);
+
+        return ResponseEntity.ok(
+                ApiResponseWrapper.success(response, "Turno encontrado")
+        );
+    }
+
+    //Obtiene la cola de espera de un sector
+    //GET /api/turnos/cola/{sectorId}
+    @GetMapping("/cola/{sectorId}")
+    @PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+    public ResponseEntity<ApiResponseWrapper<List<TurnoSummaryResponse>>> obtenerColaEspera(
+            @PathVariable Long sectorId) {
+
+        log.debug("Obteniendo cola de espera del sector: {}", sectorId);
+
+        // Validar que existe el sector
+        Sector sector = sectorService.buscarPorId(sectorId)
+                .orElseThrow(() -> ResourceNotFoundException.sector(sectorId));
+
+        List<Turno> cola = turnoService.obtenerColaEspera(sectorId);
+        List<TurnoSummaryResponse> response = TurnoMapper.toSummaryResponseList(cola);
+
+        return ResponseEntity.ok(
+                ApiResponseWrapper.success(response,
+                        String.format("Cola de espera del sector %s: %d turnos",
+                                sector.getCodigo(), cola.size()))
+        );
+    }
+
+    //Obtiene el próximo turno a atender en un sector
+    //GET /api/turnos/proximo/{sectorId}
+    @GetMapping("/proximo/{sectorId}")
+    @PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+    public ResponseEntity<ApiResponseWrapper<TurnoSummaryResponse>> obtenerProximoTurno(
+            @PathVariable Long sectorId) {
+
+        log.debug("Obteniendo próximo turno del sector: {}", sectorId);
+
+        Sector sector = sectorService.buscarPorId(sectorId)
+                .orElseThrow(() -> ResourceNotFoundException.sector(sectorId));
+
+        return turnoService.obtenerProximoTurno(sectorId)
+                .map(turno -> {
+                    TurnoSummaryResponse response = TurnoMapper.toSummaryResponse(turno);
+                    return ResponseEntity.ok(
+                            ApiResponseWrapper.success(response, "Próximo turno encontrado")
+                    );
+                })
+                .orElse(ResponseEntity.ok(
+                        ApiResponseWrapper.success(null, "No hay turnos pendientes en el sector " + sector.getCodigo())
+                ));
+    }
+
+    //Lista turnos de un ciudadano por DNI
+    //GET /api/turnos/ciudadano/{dni}
+    @GetMapping("/ciudadano/{dni}")
+    @PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+    public ResponseEntity<ApiResponseWrapper<List<TurnoSummaryResponse>>> listarTurnosCiudadano(
+            @PathVariable
+            @Pattern(regexp = "^[0-9]{7,8}$", message = "El DNI debe tener entre 7 y 8 dígitos")
+            String dni) {
+
+        log.debug("Listando turnos del ciudadano DNI: {}", dni);
+
+        Ciudadano ciudadano = ciudadanoService.buscarPorDni(dni)
+                .orElseThrow(() -> ResourceNotFoundException.ciudadano(dni));
+
+        List<Turno> turnos = turnoService.listarTurnosCiudadano(ciudadano.getId());
+        List<TurnoSummaryResponse> response = TurnoMapper.toSummaryResponseList(turnos);
+
+        return ResponseEntity.ok(
+                ApiResponseWrapper.success(response,
+                        String.format("Se encontraron %d turnos para el ciudadano %s",
+                                turnos.size(), ciudadano.getNombreCompleto()))
+        );
+    }
+
+    //Lista turnos de un sector en una fecha específica
+    //GET /api/turnos/sector/{sectorId}/fecha/{fecha}
+    @GetMapping("/sector/{sectorId}/fecha/{fecha}")
+    @PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+    public ResponseEntity<ApiResponseWrapper<List<TurnoSummaryResponse>>> listarTurnosPorFecha(
+            @PathVariable Long sectorId,
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha) {
+
+        log.debug("Listando turnos del sector {} para fecha: {}", sectorId, fecha);
+
+        Sector sector = sectorService.buscarPorId(sectorId)
+                .orElseThrow(() -> ResourceNotFoundException.sector(sectorId));
+
+        List<Turno> turnos = turnoService.listarTurnosDelDia(sectorId, fecha);
+        List<TurnoSummaryResponse> response = TurnoMapper.toSummaryResponseList(turnos);
+
+        return ResponseEntity.ok(
+                ApiResponseWrapper.success(response,
+                        String.format("Se encontraron %d turnos para el sector %s en fecha %s",
+                                turnos.size(), sector.getCodigo(), fecha))
+        );
+    }
+
+    // ==========================================
+    // ENDPOINTS DE OPERACIONES (EMPLEADOS)
+    // ==========================================
+
+    //Llama un turno
+    //POST /api/turnos/{id}/llamar
+    @PostMapping("/{id}/llamar")
+    @PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+    public ResponseEntity<ApiResponseWrapper<TurnoResponse>> llamarTurno(
+            @PathVariable Long id,
+            @Valid @RequestBody LlamarTurnoRequest request,
+            Authentication authentication) {
+
+        log.info("Llamando turno ID: {}", id);
+
+        try {
+            Long empleadoId = obtenerEmpleadoIdDesdeAuth(authentication);
+
+            Turno turno = turnoService.llamarTurno(id, empleadoId);
+            TurnoResponse response = TurnoMapper.toResponse(turno);
+
+            log.info("Turno {} llamado exitosamente", turno.getCodigo());
+
+            return ResponseEntity.ok(
+                    ApiResponseWrapper.success(response, "Turno llamado exitosamente")
+            );
+
+        } catch (Exception e) {
+            log.warn("Error llamando turno {}: {}", id, e.getMessage());
+            return ResponseEntity.badRequest().body(
+                    ApiResponseWrapper.error(e.getMessage(), "CALL_ERROR")
+            );
+        }
+    }
+
+    //Inicia atención de un turno
+    //POST /api/turnos/{id}/iniciar-atencion
+    @PostMapping("/{id}/iniciar-atencion")
+    @PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+    public ResponseEntity<ApiResponseWrapper<TurnoResponse>> iniciarAtencion(
+            @PathVariable Long id,
+            Authentication authentication) {
+
+        log.info("Iniciando atención del turno ID: {}", id);
+
+        try {
+            Long empleadoId = obtenerEmpleadoIdDesdeAuth(authentication);
+
+            Turno turno = turnoService.iniciarAtencion(id, empleadoId);
+            TurnoResponse response = TurnoMapper.toResponse(turno);
+
+            log.info("Atención iniciada para turno: {}", turno.getCodigo());
+
+            return ResponseEntity.ok(
+                    ApiResponseWrapper.success(response, "Atención iniciada exitosamente")
+            );
+
+        } catch (Exception e) {
+            log.warn("Error iniciando atención del turno {}: {}", id, e.getMessage());
+            return ResponseEntity.badRequest().body(
+                    ApiResponseWrapper.error(e.getMessage(), "START_ATTENTION_ERROR")
+            );
+        }
+    }
+
+    //Finaliza atención de un turno
+    //POST /api/turnos/{id}/finalizar
+    @PostMapping("/{id}/finalizar")
+    @PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+    public ResponseEntity<ApiResponseWrapper<TurnoResponse>> finalizarAtencion(
+            @PathVariable Long id,
+            @Valid @RequestBody FinalizarTurnoRequest request) {
+
+        log.info("Finalizando atención del turno ID: {}", id);
+
+        try {
+            Turno turno = turnoService.finalizarAtencion(id, request.getObservaciones());
+            TurnoResponse response = TurnoMapper.toResponse(turno);
+
+            log.info("Atención finalizada para turno: {}", turno.getCodigo());
+
+            return ResponseEntity.ok(
+                    ApiResponseWrapper.success(response, "Atención finalizada exitosamente")
+            );
+
+        } catch (Exception e) {
+            log.warn("Error finalizando atención del turno {}: {}", id, e.getMessage());
+            return ResponseEntity.badRequest().body(
+                    ApiResponseWrapper.error(e.getMessage(), "FINISH_ATTENTION_ERROR")
+            );
+        }
+    }
+
+    //Marca un turno como ausente
+    //POST /api/turnos/{id}/marcar-ausente
+    @PostMapping("/{id}/marcar-ausente")
+    @PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+    public ResponseEntity<ApiResponseWrapper<TurnoResponse>> marcarAusente(
+            @PathVariable Long id,
+            @Valid @RequestBody MarcarAusenteRequest request,
+            Authentication authentication) {
+
+        log.info("Marcando como ausente el turno ID: {}", id);
+
+        try {
+            Long empleadoId = obtenerEmpleadoIdDesdeAuth(authentication);
+
+            Turno turno = turnoService.marcarAusente(id, empleadoId);
+            TurnoResponse response = TurnoMapper.toResponse(turno);
+
+            log.info("Turno {} marcado como ausente", turno.getCodigo());
+
+            return ResponseEntity.ok(
+                    ApiResponseWrapper.success(response, "Turno marcado como ausente")
+            );
+
+        } catch (Exception e) {
+            log.warn("Error marcando ausente el turno {}: {}", id, e.getMessage());
+            return ResponseEntity.badRequest().body(
+                    ApiResponseWrapper.error(e.getMessage(), "MARK_ABSENT_ERROR")
+            );
+        }
+    }
+
+    //Redirige un turno a otro sector
+    //POST /api/turnos/{id}/redirigir
+    @PostMapping("/{id}/redirigir")
+    @PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+    public ResponseEntity<ApiResponseWrapper<TurnoResponse>> redirigirTurno(
+            @PathVariable Long id,
+            @Valid @RequestBody RedirigirTurnoRequest request,
+            Authentication authentication) {
+
+        log.info("Redirigiendo turno ID: {} al sector: {}", id, request.getNuevoSectorId());
+
+        try {
+            Long empleadoId = obtenerEmpleadoIdDesdeAuth(authentication);
+
+            // Validar que existe el sector destino
+            Sector sectorDestino = sectorService.buscarPorId(request.getNuevoSectorId())
+                    .orElseThrow(() -> ResourceNotFoundException.sector(request.getNuevoSectorId()));
+
+            Turno turno = turnoService.redirigirTurno(
+                    id,
+                    request.getNuevoSectorId(),
+                    request.getMotivo(),
+                    empleadoId
+            );
+
+            TurnoResponse response = TurnoMapper.toResponse(turno);
+
+            log.info("Turno {} redirigido exitosamente al sector {}",
+                    turno.getCodigo(), sectorDestino.getCodigo());
+
+            return ResponseEntity.ok(
+                    ApiResponseWrapper.success(response,
+                            "Turno redirigido exitosamente al sector " + sectorDestino.getCodigo())
+            );
+
+        } catch (Exception e) {
+            log.warn("Error redirigiendo turno {}: {}", id, e.getMessage());
+            return ResponseEntity.badRequest().body(
+                    ApiResponseWrapper.error(e.getMessage(), "REDIRECT_ERROR")
+            );
+        }
+    }
+
+    // ==========================================
+    // ENDPOINTS DE ESTADÍSTICAS BÁSICAS
+    // ==========================================
+
+    //Cuenta turnos pendientes en un sector
+    //GET /api/turnos/pendientes/{sectorId}
+    @GetMapping("/pendientes/{sectorId}")
+    @PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+    public ResponseEntity<ApiResponseWrapper<Integer>> contarTurnosPendientes(@PathVariable Long sectorId) {
+
+        log.debug("Contando turnos pendientes del sector: {}", sectorId);
+
+        Sector sector = sectorService.buscarPorId(sectorId)
+                .orElseThrow(() -> ResourceNotFoundException.sector(sectorId));
+
+        int count = turnoService.contarTurnosPendientes(sectorId);
+
+        return ResponseEntity.ok(
+                ApiResponseWrapper.success(count,
+                        String.format("El sector %s tiene %d turnos pendientes", sector.getCodigo(), count))
+        );
+    }
+
+    // ==========================================
+    // MÉTODOS HELPER PRIVADOS
+    // ==========================================
+
+    //Obtiene el ID del empleado desde el contexto de autenticación
+    private Long obtenerEmpleadoIdDesdeAuth(Authentication authentication) {
+        // TODO: Implementar extracción del empleado desde el JWT/Authentication
+        // Por ahora retorna null para que el service maneje sin empleado
+        return null;
+    }
+
+    //Procesa ciudadano para GenerarTurnoRequest (crear o actualizar)
+    private Ciudadano procesarCiudadano(GenerarTurnoRequest request) {
+        if (request.tieneDatosCiudadano()) {
+            // Crear o actualizar con datos completos
+            return ciudadanoService.crearOActualizar(
+                    request.getDni(),
+                    request.getNombre(),
+                    request.getApellido(),
+                    request.getTelefono(),
+                    request.getDireccion()
+            );
+        } else {
+            // Buscar ciudadano existente
+            return ciudadanoService.buscarPorDni(request.getDni())
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            "Ciudadano no encontrado. Debe proporcionar datos completos para ciudadanos nuevos."));
+        }
+    }
+}

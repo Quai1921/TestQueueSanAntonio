@@ -1,0 +1,548 @@
+package queue_san_antonio.queues.services.impl;
+
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import queue_san_antonio.queues.models.*;
+import queue_san_antonio.queues.repositories.CiudadanoRepository;
+import queue_san_antonio.queues.repositories.EmpleadoRepository;
+import queue_san_antonio.queues.repositories.SectorRepository;
+import queue_san_antonio.queues.repositories.TurnoRepository;
+import queue_san_antonio.queues.services.EstadisticaTurnoService;
+import queue_san_antonio.queues.services.HistorialTurnoService;
+import queue_san_antonio.queues.services.TurnoService;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+@Transactional
+public class TurnoServiceImpl implements TurnoService {
+
+    private final TurnoRepository turnoRepository;
+    private final CiudadanoRepository ciudadanoRepository;
+    private final SectorRepository sectorRepository;
+    private final EmpleadoRepository empleadoRepository;
+    private final HistorialTurnoService historialTurnoService;
+    private final EstadisticaTurnoService estadisticaTurnoService;
+
+
+
+    @Override
+    public Turno guardar(Turno turno) {
+        log.debug("Guardando turno: {}", turno.getCodigo());
+        return turnoRepository.save(turno);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Turno> buscarPorId(Long id) {
+        if (id == null) {
+            return Optional.empty();
+        }
+        return turnoRepository.findById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Turno> buscarPorCodigo(String codigo) {
+        if (codigo == null || codigo.trim().isEmpty()) {
+            return Optional.empty();
+        }
+        return turnoRepository.findByCodigo(codigo.trim().toUpperCase());
+    }
+
+    @Override
+    public Turno generarTurno(Long ciudadanoId, Long sectorId, TipoTurno tipo, Long empleadoId) {
+        // Validar parámetros
+        if (ciudadanoId == null) {
+            throw new IllegalArgumentException("El ID del ciudadano no puede ser nulo");
+        }
+        if (sectorId == null) {
+            throw new IllegalArgumentException("El ID del sector no puede ser nulo");
+        }
+        if (tipo == null) {
+            tipo = TipoTurno.NORMAL;
+        }
+
+        Empleado empleado = null;
+        if (empleadoId != null) {
+            empleado = empleadoRepository.findById(empleadoId)
+                    .orElseThrow(() -> new IllegalArgumentException("No se encontró empleado con ID: " + empleadoId));
+
+            if (!empleado.puedeAcceder()) {
+                throw new IllegalStateException("El empleado no está activo");
+            }
+        }
+
+        log.info("Generando turno para ciudadano {} en sector {} - Tipo: {}",
+                ciudadanoId, sectorId, tipo);
+
+        // Buscar entidades
+        Ciudadano ciudadano = ciudadanoRepository.findById(ciudadanoId)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró ciudadano con ID: " + ciudadanoId));
+
+        Sector sector = sectorRepository.findById(sectorId)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró sector con ID: " + sectorId));
+
+        // Validaciones de negocio
+        validarGeneracionTurno(ciudadano, sector, tipo);
+
+        // Generar código único
+        String codigo = generarCodigoTurno(sector.getCodigo(), LocalDate.now());
+
+        // Determinar prioridad inicial
+        int prioridad = determinarPrioridadInicial(ciudadano, tipo);
+
+        // Crear turno
+        Turno nuevoTurno = Turno.builder()
+                .codigo(codigo)
+                .ciudadano(ciudadano)
+                .sector(sector)
+                .estado(EstadoTurno.GENERADO)
+                .tipo(tipo)
+                .prioridad(prioridad)
+                .build();
+
+        // Guardar turno
+        Turno turnoGuardado = guardar(nuevoTurno);
+
+        // Registrar en historial
+        historialTurnoService.registrarGeneracion(turnoGuardado, empleado);
+
+        // Actualizar estadísticas
+        estadisticaTurnoService.actualizarTurnoGenerado(sectorId, empleadoId);
+
+        log.info("Turno generado exitosamente: {} para ciudadano {} en sector {}",
+                codigo, ciudadano.getDni(), sector.getCodigo());
+
+        return turnoGuardado;
+    }
+
+    @Override
+    public Turno generarTurnoEspecial(Long ciudadanoId, Long sectorId, LocalDate fechaCita, LocalTime horaCita, Long empleadoId) {
+        if (fechaCita == null || horaCita == null) {
+            throw new IllegalArgumentException("Fecha y hora de cita son obligatorias para turnos especiales");
+        }
+
+        log.info("Generando turno especial para ciudadano {} en sector {} - Cita: {} {}",
+                ciudadanoId, sectorId, fechaCita, horaCita);
+
+        // Generar turno normal primero
+        Turno turno = generarTurno(ciudadanoId, sectorId, TipoTurno.ESPECIAL, empleadoId);
+        Turno turnoActualizado = guardar(turno);
+
+        // Configurar como cita especial
+        turno.configurarCitaEspecial(fechaCita, horaCita);
+
+        Empleado empleado = null;
+        if (empleadoId != null) {
+            empleado = empleadoRepository.findById(empleadoId).orElse(null);
+        }
+
+        // Crear registro específico para la cita especial
+        HistorialTurno registroCita = HistorialTurno.builder()
+                .turno(turnoActualizado)
+                .accion(AccionTurno.CAMBIO_ESTADO)
+                .empleado(empleado)
+                .observaciones(String.format("Configurado como cita especial para %s a las %s", fechaCita, horaCita))
+                .build();
+        historialTurnoService.guardar(registroCita);
+
+        return turnoActualizado;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Turno> obtenerColaEspera(Long sectorId) {
+        if (sectorId == null) {
+            return List.of();
+        }
+        return turnoRepository.findTurnosActivosBySector(sectorId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Turno> obtenerProximoTurno(Long sectorId) {
+        if (sectorId == null) {
+            return Optional.empty();
+        }
+
+        List<Turno> proximosTurnos = turnoRepository.findProximoTurnoSector(sectorId);
+        return proximosTurnos.isEmpty() ? Optional.empty() : Optional.of(proximosTurnos.get(0));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public int contarTurnosPendientes(Long sectorId) {
+        if (sectorId == null) {
+            return 0;
+        }
+
+        List<Turno> turnosActivos = obtenerColaEspera(sectorId);
+        return (int) turnosActivos.stream()
+                .filter(turno -> turno.getEstado() == EstadoTurno.GENERADO)
+                .count();
+    }
+
+    @Override
+    public Turno llamarTurno(Long turnoId, Long empleadoId) {
+        if (turnoId == null) {
+            throw new IllegalArgumentException("El ID del turno no puede ser nulo");
+        }
+        if (empleadoId == null) {
+            throw new IllegalArgumentException("El ID del empleado no puede ser nulo");
+        }
+
+        log.info("Empleado {} llamando turno {}", empleadoId, turnoId);
+
+        // Buscar entidades
+        Turno turno = buscarPorId(turnoId)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró turno con ID: " + turnoId));
+
+        Empleado empleado = empleadoRepository.findById(empleadoId)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró empleado con ID: " + empleadoId));
+
+        // Validaciones
+        validarLlamadoTurno(turno, empleado);
+
+        // Llamar turno
+        turno.llamar();
+        Turno turnoActualizado = guardar(turno);
+
+        // Registrar en historial
+        historialTurnoService.registrarLlamado(turnoActualizado, empleado);
+
+        log.info("Turno {} llamado exitosamente por empleado {}",
+                turno.getCodigo(), empleado.getUsername());
+
+        return turnoActualizado;
+    }
+
+    @Override
+    public Turno iniciarAtencion(Long turnoId, Long empleadoId) {
+        if (turnoId == null) {
+            throw new IllegalArgumentException("El ID del turno no puede ser nulo");
+        }
+        if (empleadoId == null) {
+            throw new IllegalArgumentException("El ID del empleado no puede ser nulo");
+        }
+
+        log.info("Empleado {} iniciando atención del turno {}", empleadoId, turnoId);
+
+        // Buscar entidades
+        Turno turno = buscarPorId(turnoId)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró turno con ID: " + turnoId));
+
+        Empleado empleado = empleadoRepository.findById(empleadoId)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró empleado con ID: " + empleadoId));
+
+        // Validaciones
+        validarInicioAtencion(turno, empleado);
+
+        // Iniciar atención
+        turno.iniciarAtencion(empleado);
+        Turno turnoActualizado = guardar(turno);
+
+        // Registrar en historial
+        historialTurnoService.registrarInicioAtencion(turnoActualizado, empleado);
+
+        log.info("Atención iniciada para turno {} por empleado {}",
+                turno.getCodigo(), empleado.getUsername());
+
+        return turnoActualizado;
+    }
+
+    @Override
+    public Turno finalizarAtencion(Long turnoId, String observaciones) {
+        if (turnoId == null) {
+            throw new IllegalArgumentException("El ID del turno no puede ser nulo");
+        }
+
+        log.info("Finalizando atención del turno {}", turnoId);
+
+        Turno turno = buscarPorId(turnoId)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró turno con ID: " + turnoId));
+
+        // Validaciones
+        if (turno.getEstado() != EstadoTurno.EN_ATENCION) {
+            throw new IllegalStateException("Solo se pueden finalizar turnos en atención. Estado actual: " + turno.getEstado());
+        }
+
+        if (turno.getEmpleadoAtencion() == null) {
+            throw new IllegalStateException("El turno no tiene empleado asignado");
+        }
+
+        // Calcular tiempos para estadísticas
+        Long tiempoEspera = turno.getTiempoEsperaminutos();
+        Long tiempoAtencion = turno.getTiempoAtencionMinutos();
+
+        // Finalizar atención
+        turno.finalizarAtencion(observaciones);
+        Turno turnoActualizado = guardar(turno);
+
+        // Registrar en historial
+        historialTurnoService.registrarFinalizacion(turnoActualizado, turno.getEmpleadoAtencion(), observaciones);
+
+        // Actualizar estadísticas
+        if (tiempoEspera != null && tiempoAtencion != null) {
+            estadisticaTurnoService.actualizarTurnoAtendido(
+                    turno.getSector().getId(),
+                    turno.getEmpleadoAtencion().getId(),
+                    tiempoEspera.intValue(),
+                    tiempoAtencion.intValue()
+            );
+        }
+
+        log.info("Atención finalizada para turno {} - Tiempo espera: {}min, Tiempo atención: {}min",
+                turno.getCodigo(), tiempoEspera, tiempoAtencion);
+
+        return turnoActualizado;
+    }
+
+    @Override
+    public Turno marcarAusente(Long turnoId, Long empleadoId) {
+        if (turnoId == null) {
+            throw new IllegalArgumentException("El ID del turno no puede ser nulo");
+        }
+        if (empleadoId == null) {
+            throw new IllegalArgumentException("El ID del empleado no puede ser nulo");
+        }
+
+        log.info("Empleado {} marcando como ausente el turno {}", empleadoId, turnoId);
+
+        // Buscar entidades
+        Turno turno = buscarPorId(turnoId)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró turno con ID: " + turnoId));
+
+        Empleado empleado = empleadoRepository.findById(empleadoId)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró empleado con ID: " + empleadoId));
+
+        // Validaciones
+        if (!turno.estaActivo()) {
+            throw new IllegalStateException("Solo se pueden marcar como ausentes turnos activos");
+        }
+
+        // Marcar ausente
+        turno.marcarAusente();
+        Turno turnoActualizado = guardar(turno);
+
+        // Registrar en historial
+        historialTurnoService.registrarAusente(turnoActualizado, empleado);
+
+        // Actualizar estadísticas
+        estadisticaTurnoService.actualizarTurnoAusente(turno.getSector().getId(), empleado.getId());
+
+        log.info("Turno {} marcado como ausente por empleado {}",
+                turno.getCodigo(), empleado.getUsername());
+
+        return turnoActualizado;
+    }
+
+    @Override
+    public Turno redirigirTurno(Long turnoId, Long nuevoSectorId, String motivo, Long empleadoId) {
+        if (turnoId == null) {
+            throw new IllegalArgumentException("El ID del turno no puede ser nulo");
+        }
+        if (nuevoSectorId == null) {
+            throw new IllegalArgumentException("El ID del nuevo sector no puede ser nulo");
+        }
+        if (motivo == null || motivo.trim().isEmpty()) {
+            throw new IllegalArgumentException("El motivo de redirección es obligatorio");
+        }
+        if (empleadoId == null) {
+            throw new IllegalArgumentException("El ID del empleado no puede ser nulo");
+        }
+
+        log.info("Empleado {} redirigiendo turno {} al sector {} - Motivo: {}",
+                empleadoId, turnoId, nuevoSectorId, motivo);
+
+        // Buscar entidades
+        Turno turno = buscarPorId(turnoId)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró turno con ID: " + turnoId));
+
+        Sector nuevoSector = sectorRepository.findById(nuevoSectorId)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró sector con ID: " + nuevoSectorId));
+
+        Empleado empleado = empleadoRepository.findById(empleadoId)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró empleado con ID: " + empleadoId));
+
+        // Validaciones
+        validarRedireccion(turno, nuevoSector, empleado);
+
+        // Guardar sector original
+        Sector sectorOriginal = turno.getSector();
+
+        // Redirigir turno
+        turno.redirigirASector(nuevoSector, motivo.trim());
+        Turno turnoActualizado = guardar(turno);
+
+        // Registrar en historial
+        historialTurnoService.registrarRedireccion(turnoActualizado, empleado, sectorOriginal, nuevoSector, motivo.trim());
+
+        // Actualizar estadísticas
+        estadisticaTurnoService.actualizarTurnoRedirigido(sectorOriginal.getId(), empleado.getId());
+
+        log.info("Turno {} redirigido exitosamente de {} a {} por empleado {}",
+                turno.getCodigo(), sectorOriginal.getCodigo(), nuevoSector.getCodigo(), empleado.getUsername());
+
+        return turnoActualizado;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Turno> listarTurnosDelDia(Long sectorId, LocalDate fecha) {
+        if (sectorId == null || fecha == null) {
+            return List.of();
+        }
+        return turnoRepository.findTurnosDelDiaBySector(sectorId, fecha);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Turno> listarTurnosCiudadano(Long ciudadanoId) {
+        if (ciudadanoId == null) {
+            return List.of();
+        }
+        return turnoRepository.findByCiudadanoIdOrderByFechaHoraGeneracionDesc(ciudadanoId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Turno> listarTurnosPendientesCiudadano(Long ciudadanoId) {
+        if (ciudadanoId == null) {
+            return List.of();
+        }
+        return turnoRepository.findTurnosPendientesByCiudadano(ciudadanoId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean ciudadanoTieneTurnoPendiente(Long ciudadanoId) {
+        if (ciudadanoId == null) {
+            return false;
+        }
+        return !listarTurnosPendientesCiudadano(ciudadanoId).isEmpty();
+    }
+
+    @Override
+    public String generarCodigoTurno(String codigoSector, LocalDate fecha) {
+        if (codigoSector == null || codigoSector.trim().isEmpty()) {
+            throw new IllegalArgumentException("Por favor ingrese el sector");
+        }
+        if (fecha == null) {
+            fecha = LocalDate.now();
+        }
+
+        String codigoSectorLimpio = codigoSector.trim().toUpperCase();
+
+        LocalDateTime desde = fecha.atStartOfDay();
+        LocalDateTime hasta = fecha.atTime(LocalTime.MAX);
+
+        // Buscar último turno del día para este sector
+        List<Turno> ultimosTurnos = turnoRepository.findUltimoTurnoDelDia(codigoSectorLimpio, desde, hasta);
+
+        int siguienteNumero = 1;
+        if (!ultimosTurnos.isEmpty()) {
+            String ultimoCodigo = ultimosTurnos.get(0).getCodigo();
+            // Extraer número del código (ej: "A015" -> 15)
+            String numeroStr = ultimoCodigo.substring(codigoSectorLimpio.length());
+            try {
+                siguienteNumero = Integer.parseInt(numeroStr) + 1;
+            } catch (NumberFormatException e) {
+                log.warn("Error al parsear número del código: {}", ultimoCodigo);
+                siguienteNumero = 1;
+            }
+        }
+
+        // Formatear código (ej: "A001", "A015")
+        String nuevoCodigo = String.format("%s%03d", codigoSectorLimpio, siguienteNumero);
+
+        log.debug("Código generado para sector {} en fecha {}: {}", codigoSectorLimpio, fecha, nuevoCodigo);
+
+        return nuevoCodigo;
+    }
+
+
+    // Métodos de validación privados
+
+    private void validarGeneracionTurno(Ciudadano ciudadano, Sector sector, TipoTurno tipo) {
+        // Validar que el sector esté activo
+        if (!sector.estaActivo()) {
+            throw new IllegalStateException("El sector " + sector.getCodigo() + " está inactivo");
+        }
+
+        // Validar que no tenga turnos pendientes
+        if (ciudadanoTieneTurnoPendiente(ciudadano.getId())) {
+            throw new IllegalStateException("El ciudadano ya tiene un turno pendiente");
+        }
+
+        // Validar sector especial
+        if (sector.esEspecial() && tipo != TipoTurno.ESPECIAL) {
+            throw new IllegalStateException("El sector " + sector.getCodigo() + " requiere turno especial con cita previa");
+        }
+    }
+
+    private int determinarPrioridadInicial(Ciudadano ciudadano, TipoTurno tipo) {
+        if (tipo == TipoTurno.URGENTE) {
+            return 10; // Máxima prioridad
+        }
+        if (tipo == TipoTurno.REDIRIGIDO) {
+            return 3; // Alta prioridad para redirigidos
+        }
+        if (ciudadano.tienePrioridad() || tipo == TipoTurno.PRIORITARIO) {
+            return 2; // Prioridad por condición especial
+        }
+        return 0; // Prioridad normal
+    }
+
+    private void validarLlamadoTurno(Turno turno, Empleado empleado) {
+        if (turno.getEstado() != EstadoTurno.GENERADO) {
+            throw new IllegalStateException("Solo se pueden llamar turnos en estado GENERADO. Estado actual: " + turno.getEstado());
+        }
+
+        if (!empleado.puedeAcceder()) {
+            throw new IllegalStateException("El empleado no está activo");
+        }
+
+        // Validar que el empleado pueda atender este sector
+        if (!empleado.esAdministrador() &&
+                !empleado.perteneceASector(turno.getSector().getId()) &&
+                !empleado.esResponsableDeSector(turno.getSector().getId())) {
+            throw new IllegalStateException("El empleado no tiene permisos para atender turnos del sector " + turno.getSector().getCodigo());
+        }
+    }
+
+    private void validarInicioAtencion(Turno turno, Empleado empleado) {
+        if (turno.getEstado() != EstadoTurno.LLAMADO) {
+            throw new IllegalStateException("Solo se puede iniciar atención de turnos llamados. Estado actual: " + turno.getEstado());
+        }
+
+        validarLlamadoTurno(turno, empleado); // Reutilizar validaciones
+    }
+
+    private void validarRedireccion(Turno turno, Sector nuevoSector, Empleado empleado) {
+        if (!turno.estaActivo()) {
+            throw new IllegalStateException("Solo se pueden redirigir turnos activos");
+        }
+
+        if (!nuevoSector.estaActivo()) {
+            throw new IllegalStateException("No se puede redirigir a un sector inactivo: " + nuevoSector.getCodigo());
+        }
+
+        if (turno.getSector().getId().equals(nuevoSector.getId())) {
+            throw new IllegalStateException("No se puede redirigir un turno al mismo sector");
+        }
+
+        if (!empleado.puedeAcceder()) {
+            throw new IllegalStateException("El empleado no está activo");
+        }
+    }
+}
