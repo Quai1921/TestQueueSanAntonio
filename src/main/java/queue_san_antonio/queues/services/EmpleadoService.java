@@ -23,10 +23,10 @@ public interface EmpleadoService {
     // Validaciones
     boolean existePorUsername(String username);
     boolean existePorDni(String dni);
+    boolean existePorEmail(String email);
 
     // Operaciones de negocio
-    Empleado crear(String username, String password, String nombre, String apellido,
-                   RolEmpleado rol, Long sectorId);
+    Empleado crear(String username, String password, String nombre, String apellido, String email, String dni, RolEmpleado rol, Long sectorId);
     void cambiarPassword(Long empleadoId, String nuevaPassword);
     void asignarASector(Long empleadoId, Long sectorId);
     void activar(Long empleadoId);

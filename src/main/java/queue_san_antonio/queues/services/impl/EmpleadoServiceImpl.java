@@ -139,7 +139,18 @@ public class EmpleadoServiceImpl implements EmpleadoService {
     }
 
     @Override
-    public Empleado crear(String username, String password, String nombre, String apellido, RolEmpleado rol, Long sectorId) {
+    @Transactional(readOnly = true)
+    public boolean existePorEmail(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            return false;
+        }
+        return empleadoRepository.existsByDni(email.trim());
+    }
+
+
+
+    @Override
+    public Empleado crear(String username, String password, String nombre, String apellido, String email, String dni, RolEmpleado rol, Long sectorId) {
         // Validar parámetros obligatorios
         validarDatosObligatorios(username, password, nombre, apellido, rol);
 
@@ -147,12 +158,24 @@ public class EmpleadoServiceImpl implements EmpleadoService {
         String usernameLimpio = username.trim().toLowerCase();
         String nombreLimpio = nombre.trim();
         String apellidoLimpio = apellido.trim();
+        String emailLimpio = email != null ? email.trim() : null;
+        String dniLimpio = dni != null ? dni.trim() : null;
 
         log.info("Creando nuevo empleado: {} - Rol: {}", usernameLimpio, rol);
 
         // Verificar que no exista el username
         if (existePorUsername(usernameLimpio)) {
             throw new IllegalArgumentException("Ya existe un empleado con username: " + usernameLimpio);
+        }
+
+        // Verificar DNI único si se proporciona
+        if (dniLimpio != null && !dniLimpio.isEmpty() && existePorDni(dniLimpio)) {
+            throw new IllegalArgumentException("Ya existe un empleado con DNI: " + dniLimpio);
+        }
+
+        // Verificar emailúnico si se proporciona
+        if (emailLimpio != null && !emailLimpio.isEmpty() && existePorEmail(emailLimpio)) {
+            throw new IllegalArgumentException("Ya existe un empleado con email: " + emailLimpio);
         }
 
         // Buscar sector si se proporciona
@@ -175,6 +198,8 @@ public class EmpleadoServiceImpl implements EmpleadoService {
                 .password(passwordEncoder.encode(password))
                 .nombre(nombreLimpio)
                 .apellido(apellidoLimpio)
+                .email(emailLimpio)
+                .dni(dniLimpio)
                 .rol(rol)
                 .sector(sector)
                 .activo(true)

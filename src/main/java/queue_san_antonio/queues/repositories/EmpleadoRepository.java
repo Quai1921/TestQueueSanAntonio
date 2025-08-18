@@ -24,4 +24,7 @@ public interface EmpleadoRepository extends JpaRepository<Empleado, Long> {
 
     // Verificar si DNI ya existe
     boolean existsByDni(String dni);
+
+    // Verificar si email ya existe
+    boolean existsByEmail(String email);
 }

@@ -189,6 +189,13 @@ public class EmpleadoController {
             );
         }
 
+        // Verificar email único si se proporciona
+        if (request.getEmail() != null && empleadoService.existePorEmail(request.getEmail())) {
+            return ResponseEntity.badRequest().body(
+                    ApiResponseWrapper.error("Ya existe un empleado con email: " + request.getEmail(), "DUPLICATE_EMAIL")
+            );
+        }
+
         try {
             // Usar el método del service que maneja toda la lógica
             Empleado empleado = empleadoService.crear(
@@ -196,6 +203,8 @@ public class EmpleadoController {
                     request.getPassword(),
                     request.getNombre(),
                     request.getApellido(),
+                    request.getEmail(),
+                    request.getDni(),
                     request.getRol(),
                     request.getSectorId()
             );
