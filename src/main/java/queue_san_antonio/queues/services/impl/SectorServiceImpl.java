@@ -25,11 +25,21 @@ public class SectorServiceImpl implements SectorService {
 
     @Override
     public Sector guardar(Sector sector) {
+        if (sector == null) {
+            throw new IllegalArgumentException("El sector no puede ser nulo");
+        }
+
+
         log.debug("Guardando sector: {}", sector.getCodigo());
 
         // Validación de código duplicado para sectores nuevos
         if (sector.getId() == null && existePorCodigo(sector.getCodigo())) {
             throw new IllegalArgumentException("Ya existe un sector con código: " + sector.getCodigo());
+        }
+
+        // Auto-asignar orden si es un sector nuevo
+        if (sector.getId() == null && sector.getOrdenVisualizacion() == null) {
+            sector.setOrdenVisualizacion(obtenerSiguienteOrdenVisualizacion());
         }
 
         return sectorRepository.save(sector);
@@ -95,6 +105,8 @@ public class SectorServiceImpl implements SectorService {
         if (existePorCodigo(codigoLimpio)) {
             throw new IllegalArgumentException("Ya existe un sector con código: " + codigoLimpio);
         }
+
+        Integer siguienteOrden = obtenerSiguienteOrdenVisualizacion();
 
         // Crear nuevo sector
         Sector nuevoSector = Sector.builder()
@@ -219,5 +231,20 @@ public class SectorServiceImpl implements SectorService {
         if (!codigoLimpio.matches("^[A-Z]{2,10}$")) {
             throw new IllegalArgumentException("El código debe contener solo letras mayúsculas (2-10 caracteres)");
         }
+    }
+
+    // Auto-asignar orden de visualización
+    private Integer obtenerSiguienteOrdenVisualizacion() {
+        List<Sector> sectores = sectorRepository.findAll();
+        if (sectores.isEmpty()) {
+            return 1;
+        }
+
+        Integer maxOrden = sectores.stream()
+                .mapToInt(s -> s.getOrdenVisualizacion() != null ? s.getOrdenVisualizacion() : 0)
+                .max()
+                .orElse(0);
+
+        return maxOrden + 1;
     }
 }

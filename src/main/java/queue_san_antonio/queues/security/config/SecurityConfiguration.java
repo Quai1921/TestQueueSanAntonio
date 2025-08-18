@@ -56,7 +56,8 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/auth/login", "/api/auth/refresh",
                                 "/api/sectores/publicos", "/api/sectores/especiales",
                                 "api/configuraciones-pantalla/activa",
-                                "api/mensajes-institucionales/vigentes", "api/mensajes-institucionales/configuracion/{configuracionId}").permitAll()
+                                "api/mensajes-institucionales/vigentes", "api/mensajes-institucionales/configuracion/{configuracionId}",
+                                "api/turnos/codigo/{codigo}").permitAll()
                         .requestMatchers("/api/pantalla/**").permitAll()
                         .requestMatchers("/api/turnos/consulta/**").permitAll()
 

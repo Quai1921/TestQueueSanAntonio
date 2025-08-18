@@ -23,44 +23,11 @@ public class SectorMapper {
                 .capacidadMaxima(request.getCapacidadMaxima() != null ? request.getCapacidadMaxima() : 1)
                 .tiempoEstimadoAtencion(request.getTiempoEstimadoAtencion() != null ? request.getTiempoEstimadoAtencion() : 15)
                 .color(request.getColor())
-                .ordenVisualizacion(request.getOrdenVisualizacion())
+                .ordenVisualizacion(null)
                 .observaciones(request.getObservaciones() != null ? request.getObservaciones().trim() : null)
                 .activo(true) // Los sectores nuevos se crean activos
                 .build();
     }
-
-    //Actualiza Sector existente con datos del request
-//    public static void updateEntity(Sector sector, SectorRequest request) {
-//        if (sector == null || request == null) return;
-//
-//        if (request.getNombre() != null) {
-//            sector.setNombre(request.getNombre().trim());
-//        }
-//        if (request.getDescripcion() != null) {
-//            sector.setDescripcion(request.getDescripcion().trim());
-//        }
-//        if (request.getTipoSector() != null) {
-//            sector.setTipoSector(request.getTipoSector());
-//        }
-//        if (request.getRequiereCitaPrevia() != null) {
-//            sector.setRequiereCitaPrevia(request.getRequiereCitaPrevia());
-//        }
-//        if (request.getCapacidadMaxima() != null) {
-//            sector.setCapacidadMaxima(request.getCapacidadMaxima());
-//        }
-//        if (request.getTiempoEstimadoAtencion() != null) {
-//            sector.setTiempoEstimadoAtencion(request.getTiempoEstimadoAtencion());
-//        }
-//        if (request.getColor() != null) {
-//            sector.setColor(request.getColor());
-//        }
-//        if (request.getOrdenVisualizacion() != null) {
-//            sector.setOrdenVisualizacion(request.getOrdenVisualizacion());
-//        }
-//        if (request.getObservaciones() != null) {
-//            sector.setObservaciones(request.getObservaciones().trim());
-//        }
-//    }
 
     //Actualiza Sector existente con datos del SectorUpdateRequest (sin código)
     public static void updateEntity(Sector sector, SectorUpdateRequest request) {

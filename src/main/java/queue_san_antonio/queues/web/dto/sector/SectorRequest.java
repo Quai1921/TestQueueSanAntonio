@@ -57,9 +57,9 @@ public class SectorRequest {
     @JsonProperty("color")
     private String color;
 
-    @Min(value = 0, message = "El orden de visualización debe ser mayor o igual a 0")
-    @JsonProperty("ordenVisualizacion")
-    private Integer ordenVisualizacion;
+//    @Min(value = 0, message = "El orden de visualización debe ser mayor o igual a 0")
+//    @JsonProperty("ordenVisualizacion")
+//    private Integer ordenVisualizacion;
 
     //Observaciones adicionales
     @JsonProperty("observaciones")

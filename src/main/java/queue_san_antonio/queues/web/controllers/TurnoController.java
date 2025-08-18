@@ -1,5 +1,6 @@
 package queue_san_antonio.queues.web.controllers;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
@@ -10,10 +11,15 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import queue_san_antonio.queues.models.Ciudadano;
+import queue_san_antonio.queues.models.Empleado;
 import queue_san_antonio.queues.models.Sector;
 import queue_san_antonio.queues.models.Turno;
+import queue_san_antonio.queues.security.jwt.JwtService;
 import queue_san_antonio.queues.services.CiudadanoService;
+import queue_san_antonio.queues.services.EmpleadoService;
 import queue_san_antonio.queues.services.SectorService;
 import queue_san_antonio.queues.services.TurnoService;
 import queue_san_antonio.queues.web.dto.common.ApiResponseWrapper;
@@ -29,6 +35,7 @@ import queue_san_antonio.queues.web.exceptions.custom.ResourceNotFoundException;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 //Controlador REST para la gestión completa de turnos
 //Incluye generación, consultas públicas y operaciones de empleados
@@ -42,6 +49,8 @@ public class TurnoController {
     private final TurnoService turnoService;
     private final CiudadanoService ciudadanoService;
     private final SectorService sectorService;
+    private final JwtService jwtService;
+    private final EmpleadoService empleadoService;
 
     // ==========================================
     // ENDPOINTS PÚBLICOS (SIN AUTENTICACIÓN)
@@ -74,7 +83,7 @@ public class TurnoController {
     //Genera un turno (normal o especial según datos proporcionados)
     //POST /api/turnos/generar
     @PostMapping("/generar")
-    @PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('OPERADOR', 'RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<TurnoResponse>> generarTurno(
             @Valid @RequestBody GenerarTurnoRequest request,
             Authentication authentication) {
@@ -157,7 +166,7 @@ public class TurnoController {
     //Busca un turno por ID
     //GET /api/turnos/{id}
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('OPERADOR', 'RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<TurnoResponse>> buscarTurnoPorId(@PathVariable Long id) {
 
         log.debug("Buscando turno por ID: {}", id);
@@ -175,7 +184,7 @@ public class TurnoController {
     //Obtiene la cola de espera de un sector
     //GET /api/turnos/cola/{sectorId}
     @GetMapping("/cola/{sectorId}")
-    @PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('OPERADOR', 'RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<List<TurnoSummaryResponse>>> obtenerColaEspera(
             @PathVariable Long sectorId) {
 
@@ -198,7 +207,7 @@ public class TurnoController {
     //Obtiene el próximo turno a atender en un sector
     //GET /api/turnos/proximo/{sectorId}
     @GetMapping("/proximo/{sectorId}")
-    @PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('OPERADOR', 'RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<TurnoSummaryResponse>> obtenerProximoTurno(
             @PathVariable Long sectorId) {
 
@@ -222,7 +231,7 @@ public class TurnoController {
     //Lista turnos de un ciudadano por DNI
     //GET /api/turnos/ciudadano/{dni}
     @GetMapping("/ciudadano/{dni}")
-    @PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('OPERADOR', 'RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<List<TurnoSummaryResponse>>> listarTurnosCiudadano(
             @PathVariable
             @Pattern(regexp = "^[0-9]{7,8}$", message = "El DNI debe tener entre 7 y 8 dígitos")
@@ -246,7 +255,7 @@ public class TurnoController {
     //Lista turnos de un sector en una fecha específica
     //GET /api/turnos/sector/{sectorId}/fecha/{fecha}
     @GetMapping("/sector/{sectorId}/fecha/{fecha}")
-    @PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('OPERADOR', 'RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<List<TurnoSummaryResponse>>> listarTurnosPorFecha(
             @PathVariable Long sectorId,
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha) {
@@ -273,7 +282,7 @@ public class TurnoController {
     //Llama un turno
     //POST /api/turnos/{id}/llamar
     @PostMapping("/{id}/llamar")
-    @PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('OPERADOR', 'RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<TurnoResponse>> llamarTurno(
             @PathVariable Long id,
             @Valid @RequestBody LlamarTurnoRequest request,
@@ -304,7 +313,7 @@ public class TurnoController {
     //Inicia atención de un turno
     //POST /api/turnos/{id}/iniciar-atencion
     @PostMapping("/{id}/iniciar-atencion")
-    @PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('OPERADOR', 'RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<TurnoResponse>> iniciarAtencion(
             @PathVariable Long id,
             Authentication authentication) {
@@ -334,7 +343,7 @@ public class TurnoController {
     //Finaliza atención de un turno
     //POST /api/turnos/{id}/finalizar
     @PostMapping("/{id}/finalizar")
-    @PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('OPERADOR', 'RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<TurnoResponse>> finalizarAtencion(
             @PathVariable Long id,
             @Valid @RequestBody FinalizarTurnoRequest request) {
@@ -362,7 +371,7 @@ public class TurnoController {
     //Marca un turno como ausente
     //POST /api/turnos/{id}/marcar-ausente
     @PostMapping("/{id}/marcar-ausente")
-    @PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('OPERADOR', 'RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<TurnoResponse>> marcarAusente(
             @PathVariable Long id,
             @Valid @RequestBody MarcarAusenteRequest request,
@@ -393,7 +402,7 @@ public class TurnoController {
     //Redirige un turno a otro sector
     //POST /api/turnos/{id}/redirigir
     @PostMapping("/{id}/redirigir")
-    @PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('OPERADOR', 'RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<TurnoResponse>> redirigirTurno(
             @PathVariable Long id,
             @Valid @RequestBody RedirigirTurnoRequest request,
@@ -440,7 +449,7 @@ public class TurnoController {
     //Cuenta turnos pendientes en un sector
     //GET /api/turnos/pendientes/{sectorId}
     @GetMapping("/pendientes/{sectorId}")
-    @PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('OPERADOR', 'RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<Integer>> contarTurnosPendientes(@PathVariable Long sectorId) {
 
         log.debug("Contando turnos pendientes del sector: {}", sectorId);
@@ -462,9 +471,45 @@ public class TurnoController {
 
     //Obtiene el ID del empleado desde el contexto de autenticación
     private Long obtenerEmpleadoIdDesdeAuth(Authentication authentication) {
-        // TODO: Implementar extracción del empleado desde el JWT/Authentication
-        // Por ahora retorna null para que el service maneje sin empleado
-        return null;
+        try {
+            // Obtener el token JWT del request actual
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            String authHeader = request.getHeader("Authorization");
+
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                String token = authHeader.substring(7);
+                Long empleadoId = jwtService.extractEmpleadoId(token);
+
+                if (empleadoId != null) {
+                    log.debug("ID del empleado extraído del JWT: {}", empleadoId);
+                    return empleadoId;
+                } else {
+                    log.warn("No se pudo extraer empleadoId del token JWT");
+                }
+            } else {
+                log.warn("No se encontró token Authorization en el request");
+            }
+
+            // Fallback: intentar obtener desde el Authentication principal
+            if (authentication != null && authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails) {
+                String username = authentication.getName();
+                log.debug("Intentando obtener empleado por username desde Authentication: {}", username);
+
+                Optional<Empleado> empleadoOpt = empleadoService.buscarPorUsername(username);
+                if (empleadoOpt.isPresent()) {
+                    Long empleadoId = empleadoOpt.get().getId();
+                    log.debug("ID del empleado obtenido por username: {}", empleadoId);
+                    return empleadoId;
+                }
+            }
+
+            log.error("No se pudo obtener el ID del empleado desde la autenticación");
+            throw new IllegalStateException("No se pudo identificar al empleado autenticado");
+
+        } catch (Exception e) {
+            log.error("Error obteniendo empleadoId desde autenticación: {}", e.getMessage());
+            throw new IllegalStateException("Error de autenticación: " + e.getMessage());
+        }
     }
 
     //Procesa ciudadano para GenerarTurnoRequest (crear o actualizar)

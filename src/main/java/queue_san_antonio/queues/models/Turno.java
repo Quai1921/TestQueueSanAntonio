@@ -55,7 +55,7 @@ public class Turno {
     @Builder.Default
     private TipoTurno tipo = TipoTurno.NORMAL;
 
-//    @CreationTimestamp
+    @CreationTimestamp
     @Column(name = "fecha_hora_generacion", nullable = false, updatable = false)
     private LocalDateTime fechaHoraGeneracion;
 

@@ -78,6 +78,9 @@ public class LoginResponse {
         @JsonProperty("email")
         private String email;
 
+        @JsonProperty("dni")
+        private String dni;
+
         @JsonProperty("rol")
         private RolEmpleado rol;
 

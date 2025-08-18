@@ -289,6 +289,7 @@ public class AuthController {
                     .nombre(empleado.getNombre())
                     .apellido(empleado.getApellido())
                     .email(empleado.getEmail())
+                    .dni(empleado.getDni())
                     .rol(empleado.getRol())
                     .ultimoAcceso(empleado.getUltimoAcceso())
                     .build();
