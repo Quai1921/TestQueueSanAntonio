@@ -32,7 +32,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Validated
-@PreAuthorize("hasAnyRole('EMPLEADO', 'RESPONSABLE', 'ADMINISTRADOR')")
+@PreAuthorize("hasAnyRole('OPERADOR', 'RESPONSABLE_SECTOR', 'ADMIN')")
 public class HistorialTurnoController {
 
     private final HistorialTurnoService historialTurnoService;
@@ -130,7 +130,7 @@ public class HistorialTurnoController {
     //Obtiene las acciones de un empleado en un período
     //GET /api/historial/empleado/{empleadoId}/periodo?fechaInicio=2024-01-01&fechaFin=2024-01-31
     @GetMapping("/empleado/{empleadoId}/periodo")
-    @PreAuthorize("hasAnyRole('RESPONSABLE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<List<HistorialSummaryResponse>>> obtenerAccionesEmpleado(
             @PathVariable Long empleadoId,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaInicio,
@@ -169,25 +169,27 @@ public class HistorialTurnoController {
     }
 
     //Genera un reporte de auditoría completo para un empleado
-    //POST /api/historial/empleado/{empleadoId}/auditoria
-    @PostMapping("/empleado/{empleadoId}/auditoria")
-    @PreAuthorize("hasAnyRole('RESPONSABLE', 'ADMINISTRADOR')")
+    //GET /api/historial/empleado/{empleadoId}/auditoria
+    @GetMapping("/empleado/{empleadoId}/auditoria")
+    @PreAuthorize("hasAnyRole('RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<ResumenAuditoriaResponse>> generarAuditoriaEmpleado(
             @PathVariable Long empleadoId,
-            @Valid @RequestBody AuditoriaEmpleadoRequest request) {
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaInicio,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaFin) {
 
         log.info("Generando auditoría del empleado {} entre {} y {}",
-                empleadoId, request.getFechaInicio(), request.getFechaFin());
+                empleadoId, fechaInicio, fechaFin);
 
         // Validar fechas
-        if (!request.fechasValidas()) {
+        if (fechaFin.isBefore(fechaInicio)) {
             return ResponseEntity.badRequest().body(
                     ApiResponseWrapper.error("La fecha de fin no puede ser anterior a la fecha de inicio",
                             "INVALID_DATE_RANGE")
             );
         }
 
-        if (!request.rangoValido()) {
+        // Validar rango máximo (3 meses para auditoría)
+        if (fechaInicio.plusMonths(3).isBefore(fechaFin)) {
             return ResponseEntity.badRequest().body(
                     ApiResponseWrapper.error("El período de auditoría no puede exceder 3 meses",
                             "DATE_RANGE_TOO_LARGE")
@@ -199,12 +201,12 @@ public class HistorialTurnoController {
                 .orElseThrow(() -> ResourceNotFoundException.empleado(empleadoId));
 
         List<HistorialTurno> historial = historialTurnoService.listarAccionesEmpleado(
-                empleadoId, request.getFechaInicio(), request.getFechaFin());
+                empleadoId, fechaInicio, fechaFin);
 
         ResumenAuditoriaResponse resumen = HistorialTurnoMapper.toResumenAuditoria(
                 historial,
-                request.getFechaInicio(),
-                request.getFechaFin(),
+                fechaInicio,
+                fechaFin,
                 empleado.getUsername(),
                 empleado.getNombreCompleto(),
                 empleado.getSector() != null ? empleado.getSector().getCodigo() : "N/A",
@@ -226,7 +228,7 @@ public class HistorialTurnoController {
     //Obtiene las últimas acciones del sistema
     //GET /api/historial/ultimas-acciones?limite=50
     @GetMapping("/ultimas-acciones")
-    @PreAuthorize("hasAnyRole('RESPONSABLE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<List<HistorialSummaryResponse>>> obtenerUltimasAcciones(
             @RequestParam(defaultValue = "50") @Min(1) @Max(500) int limite) {
 
@@ -244,7 +246,7 @@ public class HistorialTurnoController {
     //Obtiene las acciones del día actual
     //GET /api/historial/acciones-hoy
     @GetMapping("/acciones-hoy")
-    @PreAuthorize("hasAnyRole('RESPONSABLE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<List<HistorialSummaryResponse>>> obtenerAccionesHoy() {
 
         log.debug("Obteniendo acciones de hoy");
@@ -268,7 +270,7 @@ public class HistorialTurnoController {
     //Obtiene actividad reciente (últimas 24 horas)
     //GET /api/historial/actividad-reciente
     @GetMapping("/actividad-reciente")
-    @PreAuthorize("hasAnyRole('RESPONSABLE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<List<HistorialSummaryResponse>>> obtenerActividadReciente() {
 
         log.debug("Obteniendo actividad reciente (24 horas)");
@@ -294,7 +296,7 @@ public class HistorialTurnoController {
     //Busca turnos que han sido redirigidos
     //GET /api/historial/redirecciones?limite=100
     @GetMapping("/redirecciones")
-    @PreAuthorize("hasAnyRole('RESPONSABLE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<List<HistorialSummaryResponse>>> obtenerRedirecciones(
             @RequestParam(defaultValue = "100") @Min(1) @Max(500) int limite) {
 
@@ -317,7 +319,7 @@ public class HistorialTurnoController {
     //Busca cambios de estado específicos
     //GET /api/historial/cambios-estado?limite=100
     @GetMapping("/cambios-estado")
-    @PreAuthorize("hasAnyRole('RESPONSABLE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<List<HistorialSummaryResponse>>> obtenerCambiosEstado(
             @RequestParam(defaultValue = "100") @Min(1) @Max(500) int limite) {
 
@@ -344,7 +346,7 @@ public class HistorialTurnoController {
     //Obtiene el historial de una fecha específica
     //GET /api/historial/fecha/{fecha}?limite=200
     @GetMapping("/fecha/{fecha}")
-    @PreAuthorize("hasAnyRole('RESPONSABLE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<List<HistorialSummaryResponse>>> obtenerHistorialPorFecha(
             @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fecha,
             @RequestParam(defaultValue = "200") @Min(1) @Max(1000) int limite) {
@@ -369,7 +371,7 @@ public class HistorialTurnoController {
     //Compara la actividad entre dos fechas
     //GET /api/historial/comparar-fechas?fecha1=2024-01-01&fecha2=2024-01-02
     @GetMapping("/comparar-fechas")
-    @PreAuthorize("hasAnyRole('RESPONSABLE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<List<HistorialSummaryResponse>>> compararActividadEntreFechas(
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fecha1,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fecha2) {
@@ -401,7 +403,7 @@ public class HistorialTurnoController {
     //Rastrea la trazabilidad completa de un ciudadano por DNI
     //GET /api/historial/ciudadano/{dni}/trazabilidad
     @GetMapping("/ciudadano/{dni}/trazabilidad")
-    @PreAuthorize("hasAnyRole('RESPONSABLE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<List<HistorialSummaryResponse>>> obtenerTrazabilidadCiudadano(
             @PathVariable String dni,
             @RequestParam(defaultValue = "500") @Min(1) @Max(1000) int limite) {
@@ -428,7 +430,7 @@ public class HistorialTurnoController {
     //Obtiene resumen de actividad por empleado en el día actual
     //GET /api/historial/resumen-empleados-hoy
     @GetMapping("/resumen-empleados-hoy")
-    @PreAuthorize("hasAnyRole('RESPONSABLE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<List<HistorialSummaryResponse>>> obtenerResumenEmpleadosHoy() {
 
         log.debug("Obteniendo resumen de actividad de empleados para hoy");
