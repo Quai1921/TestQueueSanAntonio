@@ -206,11 +206,28 @@ public class Sector {
         this.requiereCitaPrevia = requiereCita;
     }
 
+    // Obtiene lista de operadores del sector
+    public List<Empleado> getOperadores() {
+        return empleados.stream()
+                .filter(empleado -> empleado.getRol() == RolEmpleado.OPERADOR)
+                .filter(Empleado::getActivo)
+                .toList();
+    }
+
+    // Obtiene total de turnos atendidos del sector
+    public Integer getTurnosAtendidos() {
+        return empleados.stream()
+                .mapToInt(Empleado::getCantidadTurnosAtendidos)
+                .sum();
+    }
+
     @Override
     public String toString() {
         return String.format("Sector{id=%d, codigo='%s', nombre='%s', tipo=%s, activo=%s}",
                 id, codigo, nombre, tipoSector, activo);
     }
+
+
 
 }
 

@@ -83,6 +83,8 @@ public class SectorMapper {
                 .responsable(toResponsableInfo(sector))
                 .cantidadEmpleados(sector.getCantidadEmpleadosActivos())
                 .turnosPendientes(sector.getTurnosPendientes())
+                .turnosAtendidos(sector.getTurnosAtendidos())
+                .operadores(toOperadoresInfo(sector))
                 .tieneHorarios(sector.tieneHorariosConfigurados())
                 .build();
     }
@@ -106,5 +108,18 @@ public class SectorMapper {
                 .nombreCompleto(sector.getResponsable().getNombreCompleto())
                 .email(sector.getResponsable().getEmail())
                 .build();
+    }
+
+    // Nuevo método para convertir operadores
+    private static List<SectorResponse.OperadorInfo> toOperadoresInfo(Sector sector) {
+        return sector.getOperadores().stream()
+                .map(operador -> SectorResponse.OperadorInfo.builder()
+                        .id(operador.getId())
+                        .username(operador.getUsername())
+                        .nombreCompleto(operador.getNombreCompleto())
+                        .cantidadTurnosAtendidos(operador.getCantidadTurnosAtendidos())
+                        .activo(operador.getActivo())
+                        .build())
+                .toList();
     }
 }

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import queue_san_antonio.queues.models.TipoSector;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 //DTO para respuesta de sector
 @Data
@@ -61,6 +62,12 @@ public class SectorResponse {
     @JsonProperty("responsable")
     private ResponsableInfo responsable;
 
+    @JsonProperty("operadores")
+    private List<OperadorInfo> operadores;
+
+    @JsonProperty("turnosAtendidos")
+    private Integer turnosAtendidos;
+
     //Estadísticas del sector
     @JsonProperty("cantidadEmpleados")
     private Integer cantidadEmpleados;
@@ -88,5 +95,26 @@ public class SectorResponse {
 
         @JsonProperty("email")
         private String email;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class OperadorInfo {
+        @JsonProperty("id")
+        private Long id;
+
+        @JsonProperty("username")
+        private String username;
+
+        @JsonProperty("nombreCompleto")
+        private String nombreCompleto;
+
+        @JsonProperty("cantidadTurnosAtendidos")
+        private Integer cantidadTurnosAtendidos;
+
+        @JsonProperty("activo")
+        private Boolean activo;
     }
 }

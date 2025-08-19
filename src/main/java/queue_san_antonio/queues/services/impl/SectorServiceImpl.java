@@ -66,7 +66,7 @@ public class SectorServiceImpl implements SectorService {
     @Override
     @Transactional(readOnly = true)
     public List<Sector> listarTodos() {
-        return sectorRepository.findAll();
+        return sectorRepository.findAllWithEmpleados();
     }
 
     @Override

@@ -24,4 +24,7 @@ public interface SectorRepository extends JpaRepository<Sector, Long> {
 
     // Verificar si código ya existe
     boolean existsByCodigo(String codigo);
+
+    @Query("SELECT DISTINCT s FROM Sector s LEFT JOIN FETCH s.empleados e WHERE e.activo = true OR e IS NULL ORDER BY s.ordenVisualizacion ASC, s.nombre ASC")
+    List<Sector> findAllWithEmpleados();
 }
