@@ -144,7 +144,7 @@ public class EmpleadoServiceImpl implements EmpleadoService {
         if (email == null || email.trim().isEmpty()) {
             return false;
         }
-        return empleadoRepository.existsByDni(email.trim());
+        return empleadoRepository.existsByEmail(email.trim());
     }
 
 
@@ -208,7 +208,18 @@ public class EmpleadoServiceImpl implements EmpleadoService {
         log.debug("Creando empleado: {} - Sector: {}", usernameLimpio,
                 sector != null ? sector.getCodigo() : "Sin asignar");
 
-        return guardar(nuevoEmpleado);
+        Empleado empleadoGuardado = guardar(nuevoEmpleado);
+
+        // Si es responsable de sector y tiene sector asignado, asignarlo como responsable automáticamente
+        if (rol == RolEmpleado.RESPONSABLE_SECTOR && sector != null) {
+            log.info("Asignando automáticamente como responsable del sector {}", sector.getCodigo());
+            sector.establecerResponsable(empleadoGuardado);
+            sectorRepository.save(sector);
+        }
+
+        return empleadoGuardado;
+
+
     }
 
     @Override

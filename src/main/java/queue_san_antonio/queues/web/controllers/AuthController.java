@@ -72,6 +72,9 @@ public class AuthController {
 
             Empleado empleado = empleadoOpt.get();
 
+            empleado.registrarAccesoExitoso();
+            empleadoService.guardar(empleado);
+
             // Generar tokens JWT
             String accessToken = jwtService.generateToken(empleado);
             String refreshToken = jwtService.generateRefreshToken(empleado);

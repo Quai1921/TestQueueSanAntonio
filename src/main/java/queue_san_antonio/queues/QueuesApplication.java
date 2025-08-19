@@ -27,7 +27,7 @@ public class QueuesApplication {
             // Solo crear si no existe ningún empleado
             if (empleadoRepository.count() == 0) {
                 Empleado admin = Empleado.builder()
-                        .username("Quai")
+                        .username("quai")
                         .password(passwordEncoder.encode("123456"))
                         .nombre("Edgardo")
                         .apellido("Quaino")
