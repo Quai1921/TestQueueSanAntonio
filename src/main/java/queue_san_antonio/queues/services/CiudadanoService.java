@@ -21,7 +21,7 @@ public interface CiudadanoService {
     boolean existePorDni(String dni);
 
     // Operaciones de negocio
-    Ciudadano crearOActualizar(String dni, String nombre, String apellido, String telefono, String direccion);
+    Ciudadano crearOActualizar(String dni, String nombre, String apellido, String telefono, String direccion, String observaciones);
 
     void establecerPrioridad(Long ciudadanoId, boolean prioritario, String motivo);
 

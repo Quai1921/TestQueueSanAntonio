@@ -52,6 +52,7 @@ public class CiudadanoMapper {
         if (ciudadano == null) return null;
 
         return CiudadanoResponse.builder()
+                .id(ciudadano.getId())
                 .dni(ciudadano.getDni())
                 .nombre(ciudadano.getNombre())
                 .apellido(ciudadano.getApellido())
@@ -72,6 +73,7 @@ public class CiudadanoMapper {
         if (ciudadano == null) return null;
 
         return CiudadanoSummaryResponse.builder()
+                .id(ciudadano.getId())
                 .dni(ciudadano.getDni())
                 .nombreCompleto(ciudadano.getNombreCompleto())
                 .telefono(ciudadano.getTelefono())

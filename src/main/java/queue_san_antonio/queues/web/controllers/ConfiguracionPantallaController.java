@@ -84,7 +84,7 @@ public class ConfiguracionPantallaController {
 
         log.debug("Obteniendo configuración de pantalla ID: {}", id);
 
-        ConfiguracionPantalla configuracion = configuracionPantallaService.obtenerConfiguracionActiva()
+        ConfiguracionPantalla configuracion = configuracionPantallaService.buscarPorId(id)
                 .orElseThrow(() -> ResourceNotFoundException.configuracionPantalla(id));
 
         ConfiguracionPantallaResponse response = ConfiguracionPantallaMapper.toResponse(configuracion);

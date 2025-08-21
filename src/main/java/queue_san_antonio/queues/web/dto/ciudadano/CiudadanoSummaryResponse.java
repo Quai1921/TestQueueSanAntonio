@@ -13,6 +13,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CiudadanoSummaryResponse {
 
+    @JsonProperty("id")
+    private Long id;
+
     @JsonProperty("dni")
     private String dni;
 

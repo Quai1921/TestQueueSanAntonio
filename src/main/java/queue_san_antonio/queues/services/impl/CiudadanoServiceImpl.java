@@ -69,7 +69,9 @@ public class CiudadanoServiceImpl implements CiudadanoService {
         String dniLimpio = dni != null ? dni.trim() : "";
         String apellidoLimpio = apellido != null ? apellido.trim() : "";
 
-        return ciudadanoRepository.findByDniOrApellido(dniLimpio, apellidoLimpio);
+        String apellidoNormalizado = normalizarTexto(apellidoLimpio);
+
+        return ciudadanoRepository.findByDniOrApellidoNormalizado(dniLimpio, apellidoNormalizado);
     }
 
     @Override
@@ -78,7 +80,9 @@ public class CiudadanoServiceImpl implements CiudadanoService {
         if (apellido == null || apellido.trim().isEmpty()) {
             return List.of();
         }
-        return ciudadanoRepository.findByApellidoContainingIgnoreCase(apellido.trim());
+
+        String apellidoNormalizado = normalizarTexto(apellido.trim());
+        return ciudadanoRepository.findByApellidoNormalizado(apellidoNormalizado);
     }
 
     @Override
@@ -91,7 +95,7 @@ public class CiudadanoServiceImpl implements CiudadanoService {
     }
 
     @Override
-    public Ciudadano crearOActualizar(String dni, String nombre, String apellido, String telefono, String direccion) {
+    public Ciudadano crearOActualizar(String dni, String nombre, String apellido, String telefono, String direccion, String observaciones) {
         // Validar parámetros obligatorios
         validarDatosObligatorios(dni, nombre, apellido, telefono, direccion);
 
@@ -101,6 +105,7 @@ public class CiudadanoServiceImpl implements CiudadanoService {
         String apellidoLimpio = apellido.trim();
         String telefonoLimpio = telefono.trim();
         String direccionLimpia = direccion.trim();
+        String observacionesLimpias = observaciones != null ? observaciones.trim() : null;
 
         log.info("Creando/actualizando ciudadano con DNI: {}", dniLimpio);
 
@@ -110,7 +115,7 @@ public class CiudadanoServiceImpl implements CiudadanoService {
         if (ciudadanoExistente.isPresent()) {
             // Actualizar datos existentes
             Ciudadano ciudadano = ciudadanoExistente.get();
-            ciudadano.actualizarDatos(nombreLimpio, apellidoLimpio, telefonoLimpio, direccionLimpia);
+            ciudadano.actualizarDatos(nombreLimpio, apellidoLimpio, telefonoLimpio, direccionLimpia, observacionesLimpias);
 
             log.debug("Actualizando ciudadano existente: {}", dniLimpio);
             return guardar(ciudadano);
@@ -122,6 +127,7 @@ public class CiudadanoServiceImpl implements CiudadanoService {
                     .apellido(apellidoLimpio)
                     .telefono(telefonoLimpio)
                     .direccion(direccionLimpia)
+                    .observaciones(observacionesLimpias)
                     .esPrioritario(false)
                     .build();
 
@@ -178,6 +184,19 @@ public class CiudadanoServiceImpl implements CiudadanoService {
         if (!dniLimpio.matches("^[0-9]{7,8}$")) {
             throw new IllegalArgumentException("El DNI debe tener entre 7 y 8 dígitos");
         }
+    }
+
+    private String normalizarTexto(String texto) {
+        if (texto == null || texto.trim().isEmpty()) {
+            return "";
+        }
+
+        String textoLimpio = texto.trim();
+
+        // Normalizar y remover acentos/tildes
+        return java.text.Normalizer.normalize(textoLimpio, java.text.Normalizer.Form.NFD)
+                .replaceAll("[\\p{InCombiningDiacriticalMarks}]", "")
+                .toLowerCase();
     }
 
 

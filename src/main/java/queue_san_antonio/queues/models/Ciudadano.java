@@ -130,11 +130,12 @@ public class Ciudadano {
      * @param direccion nueva dirección
      */
     public void actualizarDatos(String nombre, String apellido, String telefono,
-                                String direccion) {
+                                String direccion, String observacione) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.telefono = telefono;
         this.direccion = direccion;
+        this.observaciones = observaciones;
     }
 
     @Override

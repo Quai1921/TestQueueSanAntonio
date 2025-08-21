@@ -280,7 +280,7 @@ public class EmpleadoController {
     }
 
     //Cambia la contraseña de un empleado
-    //PATCH/api/empleados/{id}/password
+    //PATCH /api/empleados/{id}/password
     @PatchMapping("/{id}/password")
     public ResponseEntity<ApiResponseWrapper<String>> cambiarPassword(
             @PathVariable Long id,

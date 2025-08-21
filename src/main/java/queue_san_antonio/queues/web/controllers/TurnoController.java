@@ -514,20 +514,41 @@ public class TurnoController {
 
     //Procesa ciudadano para GenerarTurnoRequest (crear o actualizar)
     private Ciudadano procesarCiudadano(GenerarTurnoRequest request) {
+        Ciudadano ciudadano;
+
         if (request.tieneDatosCiudadano()) {
             // Crear o actualizar con datos completos
-            return ciudadanoService.crearOActualizar(
+            ciudadano = ciudadanoService.crearOActualizar(
                     request.getDni(),
                     request.getNombre(),
                     request.getApellido(),
                     request.getTelefono(),
-                    request.getDireccion()
+                    request.getDireccion(),
+                    request.getObservaciones()
             );
+
+            // ✅ AGREGAR LÓGICA DE PRIORIDAD
+            // Si el request tiene campos de prioridad, aplicarlos
+            Boolean esPrioritario = request.getEsPrioritario();
+            String motivoPrioridad = request.getMotivoPrioridad();
+
+            if (esPrioritario != null && esPrioritario) {
+                ciudadanoService.establecerPrioridad(
+                        ciudadano.getId(),
+                        true,
+                        motivoPrioridad
+                );
+                // Recargar para obtener los datos actualizados
+                ciudadano = ciudadanoService.buscarPorId(ciudadano.getId()).orElse(ciudadano);
+            }
+
         } else {
             // Buscar ciudadano existente
-            return ciudadanoService.buscarPorDni(request.getDni())
+            ciudadano = ciudadanoService.buscarPorDni(request.getDni())
                     .orElseThrow(() -> new IllegalArgumentException(
                             "Ciudadano no encontrado. Debe proporcionar datos completos para ciudadanos nuevos."));
         }
+
+        return ciudadano;
     }
 }

@@ -257,7 +257,8 @@ public class CiudadanoController {
                 request.getNombre(),
                 request.getApellido(),
                 request.getTelefono(),
-                request.getDireccion()
+                request.getDireccion(),
+                request.getObservaciones()
         );
 
         // Si se especifica prioridad en el request, aplicarla

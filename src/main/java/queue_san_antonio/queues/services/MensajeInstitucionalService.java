@@ -20,7 +20,7 @@ public interface MensajeInstitucionalService {
 
     // Operaciones de negocio
     MensajeInstitucional crear(Long configuracionId, TipoMensaje tipo, String titulo,
-                               String contenido, Integer duracion, Integer orden);
+                               String contenido, String rutaArchivo, Integer duracion, Integer orden);
     void activar(Long mensajeId);
     void desactivar(Long mensajeId);
     void establecerVigencia(Long mensajeId, LocalDate fechaInicio, LocalDate fechaFin);

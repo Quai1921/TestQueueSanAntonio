@@ -16,6 +16,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class CiudadanoResponse {
 
+    @JsonProperty("id")
+    private Long id;
+
     @JsonProperty("dni")
     private String dni;
 

@@ -135,6 +135,13 @@ public class MensajeInstitucionalController {
         log.info("Creando mensaje institucional para configuración ID: {} - Tipo: {}",
                 configuracionId, request.getTipo());
 
+        if (!request.esValidoParaTipo()) {
+            return ResponseEntity.badRequest().body(
+                    ApiResponseWrapper.error("La ruta del archivo es obligatoria para mensajes de imagen y video",
+                            "MISSING_FILE_PATH")
+            );
+        }
+
         // Validar fechas de vigencia si se proporcionan
         if (request.getFechaInicio() != null && request.getFechaFin() != null) {
             if (request.getFechaFin().isBefore(request.getFechaInicio())) {
@@ -150,6 +157,7 @@ public class MensajeInstitucionalController {
                 request.getTipo(),
                 request.getTitulo(),
                 request.getContenido(),
+                request.getRutaArchivo(),
                 request.getDuracion(),
                 request.getOrden()
         );

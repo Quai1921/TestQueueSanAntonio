@@ -35,7 +35,17 @@ public class MensajeInstitucionalRequest {
     @Builder.Default
     private Integer orden = 0;
 
+    @Size(max = 300, message = "La ruta del archivo no puede exceder 300 caracteres")
+    private String rutaArchivo;
+
     // Campos opcionales para vigencia
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
+
+    public boolean esValidoParaTipo() {
+        if (tipo == TipoMensaje.IMAGEN || tipo == TipoMensaje.VIDEO) {
+            return rutaArchivo != null && !rutaArchivo.trim().isEmpty();
+        }
+        return true;
+    }
 }

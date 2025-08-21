@@ -19,6 +19,7 @@ public class MensajeInstitucionalResponse {
     private TipoMensaje tipo;
     private String titulo;
     private String contenido;
+    private String rutaArchivo;
     private Integer duracion;
     private Integer orden;
     private Boolean activo;

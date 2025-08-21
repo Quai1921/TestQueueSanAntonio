@@ -22,6 +22,7 @@ public class MensajeInstitucionalMapper {
                 .contenido(request.getContenido() != null ? request.getContenido().trim() : null)
                 .duracion(request.getDuracion())
                 .orden(request.getOrden() != null ? request.getOrden() : 0)
+                .rutaArchivo(request.getRutaArchivo() != null ? request.getRutaArchivo().trim() : null)
                 .fechaInicio(request.getFechaInicio() != null ? request.getFechaInicio().atStartOfDay() : null)
                 .fechaFin(request.getFechaFin() != null ? request.getFechaFin().atTime(23, 59, 59) : null)
                 .activo(true) // Nuevos mensajes activos por defecto
@@ -37,6 +38,7 @@ public class MensajeInstitucionalMapper {
                 .tipo(mensaje.getTipo())
                 .titulo(mensaje.getTitulo())
                 .contenido(mensaje.getContenido())
+                .rutaArchivo(mensaje.getRutaArchivo())
                 .duracion(mensaje.getDuracion())
                 .orden(mensaje.getOrden())
                 .activo(mensaje.getActivo())

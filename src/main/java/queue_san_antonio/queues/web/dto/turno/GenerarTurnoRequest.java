@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -38,6 +39,14 @@ public class GenerarTurnoRequest {
 
     @JsonProperty("direccion")
     private String direccion;
+
+    @JsonProperty("esPrioritario")
+    @Builder.Default
+    private Boolean esPrioritario = false;
+
+    @Size(max = 100, message = "El motivo de prioridad no puede exceder 100 caracteres")
+    @JsonProperty("motivoPrioridad")
+    private String motivoPrioridad;
 
     //ID del sector donde se genera el turno
     @NotNull(message = "El sector es obligatorio")

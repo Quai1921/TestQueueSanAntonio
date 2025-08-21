@@ -76,7 +76,7 @@ public class MensajeInstitucionalServiceImpl implements MensajeInstitucionalServ
 
     @Override
     public MensajeInstitucional crear(Long configuracionId, TipoMensaje tipo, String titulo,
-                                      String contenido, Integer duracion, Integer orden) {
+                                      String contenido, String rutaArchivo, Integer duracion, Integer orden) {
         // Validar parámetros obligatorios
         validarParametrosCreacion(configuracionId, tipo, duracion);
 
@@ -90,9 +90,10 @@ public class MensajeInstitucionalServiceImpl implements MensajeInstitucionalServ
         // Limpiar datos
         String tituloLimpio = titulo != null ? titulo.trim() : null;
         String contenidoLimpio = contenido != null ? contenido.trim() : null;
+        String rutaArchivoLimpia = rutaArchivo != null ? rutaArchivo.trim() : null;
 
         // Validar contenido según tipo
-        validarContenidoPorTipo(tipo, tituloLimpio, contenidoLimpio);
+        validarContenidoPorTipo(tipo, tituloLimpio, contenidoLimpio, rutaArchivoLimpia);
 
         // Establecer valores por defecto
         if (orden == null) {
@@ -105,6 +106,7 @@ public class MensajeInstitucionalServiceImpl implements MensajeInstitucionalServ
                 .tipo(tipo)
                 .titulo(tituloLimpio)
                 .contenido(contenidoLimpio)
+                .rutaArchivo(rutaArchivoLimpia)
                 .duracion(duracion)
                 .orden(orden)
                 .activo(true)
@@ -231,7 +233,7 @@ public class MensajeInstitucionalServiceImpl implements MensajeInstitucionalServ
     }
 
     //Valida el contenido según el tipo de mensaje
-    private void validarContenidoPorTipo(TipoMensaje tipo, String titulo, String contenido) {
+    private void validarContenidoPorTipo(TipoMensaje tipo, String titulo, String contenido, String rutaArchivo) {
         switch (tipo) {
             case TEXTO -> {
                 if (contenido == null || contenido.isEmpty()) {
@@ -242,13 +244,19 @@ public class MensajeInstitucionalServiceImpl implements MensajeInstitucionalServ
                 if (titulo == null || titulo.isEmpty()) {
                     throw new IllegalArgumentException("El título es obligatorio para mensajes con imagen");
                 }
-                // La ruta de la imagen se establecerá por separado
+
+                if (rutaArchivo == null || rutaArchivo.isEmpty()) {
+                    throw new IllegalArgumentException("La ruta del archivo es obligatoria para mensajes con imagen");
+                }
             }
             case VIDEO -> {
                 if (titulo == null || titulo.isEmpty()) {
                     throw new IllegalArgumentException("El título es obligatorio para mensajes con video");
                 }
-                // La ruta del video se establecerá por separado
+
+                if (rutaArchivo == null || rutaArchivo.isEmpty()) {
+                    throw new IllegalArgumentException("La ruta del archivo es obligatoria para mensajes con video");
+                }
             }
         }
     }

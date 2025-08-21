@@ -27,8 +27,13 @@ public interface CiudadanoRepository extends JpaRepository<Ciudadano, Long> {
 
     List<Ciudadano> findAllByOrderByApellidoAscNombreAsc();
 
+    // Búsqueda por apellido normalizado (sin tildes)
+    @Query("SELECT c FROM Ciudadano c WHERE " + "LOWER(FUNCTION('REGEXP_REPLACE', " + "FUNCTION('REGEXP_REPLACE', " + "FUNCTION('REGEXP_REPLACE', " + "FUNCTION('REGEXP_REPLACE', " + "FUNCTION('REGEXP_REPLACE', LOWER(c.apellido), '[áàäâã]', 'a'), " + "'[éèëê]', 'e'), '[íìïî]', 'i'), '[óòöôõ]', 'o'), '[úùüû]', 'u')) " + "LIKE LOWER(CONCAT('%', :apellidoNormalizado, '%'))")
+    List<Ciudadano> findByApellidoNormalizado(@Param("apellidoNormalizado") String apellidoNormalizado);
 
-
+    // Búsqueda combinada con apellido normalizado
+    @Query("SELECT c FROM Ciudadano c WHERE " + "(:dni IS NULL OR :dni = '' OR c.dni = :dni) AND " + "(:apellidoNormalizado IS NULL OR :apellidoNormalizado = '' OR " + "LOWER(FUNCTION('REGEXP_REPLACE', " + "FUNCTION('REGEXP_REPLACE', " + "FUNCTION('REGEXP_REPLACE', " + "FUNCTION('REGEXP_REPLACE', " + "FUNCTION('REGEXP_REPLACE', LOWER(c.apellido), '[áàäâã]', 'a'), " + "'[éèëê]', 'e'), '[íìïî]', 'i'), '[óòöôõ]', 'o'), '[úùüû]', 'u')) " + "LIKE LOWER(CONCAT('%', :apellidoNormalizado, '%')))")
+    List<Ciudadano> findByDniOrApellidoNormalizado(@Param("dni") String dni, @Param("apellidoNormalizado") String apellidoNormalizado);
 
 
 

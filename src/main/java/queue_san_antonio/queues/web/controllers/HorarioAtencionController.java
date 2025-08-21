@@ -226,7 +226,7 @@ public class HorarioAtencionController {
     }
 
     //Verifica si un sector está en horario de atención
-    //GET /api/sectores/{id}/en-horario/{diaSemana}/{hora}
+    //GET /api/horarios/{id}/en-horario/{diaSemana}/{hora}
     @GetMapping("/{id}/en-horario/{diaSemana}/{hora}")
     @PreAuthorize("hasAnyRole('OPERADOR', 'RESPONSABLE_SECTOR', 'ADMIN')")
     public ResponseEntity<ApiResponseWrapper<Boolean>> estaEnHorarioAtencion(
