@@ -3,6 +3,7 @@ package queue_san_antonio.queues.services;
 import queue_san_antonio.queues.models.HorarioAtencion;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -29,4 +30,10 @@ public interface HorarioAtencionService {
 
     void activar(Long horarioId);
     void desactivar(Long horarioId);
+
+    // Validar si una fecha y hora están en los horarios configurados del sector
+    boolean validarFechaHoraTurnoEspecial(Long sectorId, LocalDate fecha, LocalTime hora);
+
+    // Obtener horarios disponibles para una fecha específica considerando capacidad
+    List<LocalTime> obtenerHorariosDisponiblesParaFecha(Long sectorId, LocalDate fecha);
 }

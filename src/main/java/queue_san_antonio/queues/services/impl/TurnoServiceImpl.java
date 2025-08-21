@@ -12,8 +12,10 @@ import queue_san_antonio.queues.repositories.SectorRepository;
 import queue_san_antonio.queues.repositories.TurnoRepository;
 import queue_san_antonio.queues.services.EstadisticaTurnoService;
 import queue_san_antonio.queues.services.HistorialTurnoService;
+import queue_san_antonio.queues.services.HorarioAtencionService;
 import queue_san_antonio.queues.services.TurnoService;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -32,6 +34,7 @@ public class TurnoServiceImpl implements TurnoService {
     private final EmpleadoRepository empleadoRepository;
     private final HistorialTurnoService historialTurnoService;
     private final EstadisticaTurnoService estadisticaTurnoService;
+    private final HorarioAtencionService horarioAtencionService;
 
 
 
@@ -135,12 +138,15 @@ public class TurnoServiceImpl implements TurnoService {
         log.info("Generando turno especial para ciudadano {} en sector {} - Cita: {} {}",
                 ciudadanoId, sectorId, fechaCita, horaCita);
 
+        validarTurnoEspecial(sectorId, fechaCita, horaCita);
+
         // Generar turno normal primero
         Turno turno = generarTurno(ciudadanoId, sectorId, TipoTurno.ESPECIAL, empleadoId);
-        Turno turnoActualizado = guardar(turno);
 
         // Configurar como cita especial
         turno.configurarCitaEspecial(fechaCita, horaCita);
+
+        Turno turnoActualizado = guardar(turno);
 
         Empleado empleado = null;
         if (empleadoId != null) {
@@ -155,6 +161,9 @@ public class TurnoServiceImpl implements TurnoService {
                 .observaciones(String.format("Configurado como cita especial para %s a las %s", fechaCita, horaCita))
                 .build();
         historialTurnoService.guardar(registroCita);
+
+        log.info("Turno especial generado exitosamente: {} para cita {} {}",
+                turnoActualizado.getCodigo(), fechaCita, horaCita);
 
         return turnoActualizado;
     }
@@ -545,4 +554,60 @@ public class TurnoServiceImpl implements TurnoService {
             throw new IllegalStateException("El empleado no está activo");
         }
     }
+
+    private void validarTurnoEspecial(Long sectorId, LocalDate fechaCita, LocalTime horaCita) {
+        // 1. Validar que la fecha no sea anterior a hoy
+        if (fechaCita.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("No se puede crear un turno especial para una fecha anterior a hoy");
+        }
+
+        // 2. Validar que la fecha y hora estén en los horarios configurados
+        if (!horarioAtencionService.validarFechaHoraTurnoEspecial(sectorId, fechaCita, horaCita)) {
+            DayOfWeek diaSemana = fechaCita.getDayOfWeek();
+            throw new IllegalArgumentException(
+                    String.format("No hay atención disponible para %s a las %s en el día %s",
+                            fechaCita, horaCita, diaSemana)
+            );
+        }
+
+        // 3. Validar que no exista otro turno en esa fecha y hora exacta
+        if (turnoRepository.existeTurnoEspecial(sectorId, fechaCita, horaCita)) {
+            throw new IllegalArgumentException(
+                    String.format("Ya existe un turno especial para %s a las %s", fechaCita, horaCita)
+            );
+        }
+
+        // 4. Validar capacidad máxima del día (opcional)
+        // Obtener horarios del día para verificar capacidad
+        DayOfWeek diaSemana = fechaCita.getDayOfWeek();
+        List<HorarioAtencion> horariosDelDia = horarioAtencionService.listarPorDia(sectorId, diaSemana);
+
+        if (!horariosDelDia.isEmpty()) {
+            // Encontrar el horario que contiene la hora solicitada
+            HorarioAtencion horarioAplicable = horariosDelDia.stream()
+                    .filter(h -> h.estaActivo() && h.estaEnHorario(horaCita))
+                    .findFirst()
+                    .orElse(null);
+
+            if (horarioAplicable != null) {
+                // Verificar capacidad máxima para ese horario específico
+                long turnosExistentesEnHora = turnoRepository.existeTurnoEspecial(sectorId, fechaCita, horaCita) ? 1 : 0;
+
+                if (turnosExistentesEnHora >= horarioAplicable.getCapacidadMaxima()) {
+                    throw new IllegalArgumentException(
+                            String.format("No hay capacidad disponible para %s a las %s (máximo: %d turnos)",
+                                    fechaCita, horaCita, horarioAplicable.getCapacidadMaxima())
+                    );
+                }
+            }
+        }
+    }
+
+
+
+
+
+
+
+
 }

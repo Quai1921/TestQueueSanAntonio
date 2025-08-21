@@ -12,9 +12,13 @@ import queue_san_antonio.queues.repositories.SectorRepository;
 import queue_san_antonio.queues.services.HorarioAtencionService;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -238,6 +242,72 @@ public class HorarioAtencionServiceImpl implements HorarioAtencionService {
 
         log.debug("Horario {} desactivado exitosamente", horarioId);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean validarFechaHoraTurnoEspecial(Long sectorId, LocalDate fecha, LocalTime hora) {
+        if (sectorId == null || fecha == null || hora == null) {
+            return false;
+        }
+
+        // Validar que la fecha no sea anterior a hoy
+        if (fecha.isBefore(LocalDate.now())) {
+            return false;
+        }
+
+        // Obtener el día de la semana de la fecha
+        DayOfWeek diaSemana = fecha.getDayOfWeek();
+
+        // Verificar si está en horario de atención
+        return estaEnHorarioAtencion(sectorId, diaSemana, hora);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<LocalTime> obtenerHorariosDisponiblesParaFecha(Long sectorId, LocalDate fecha) {
+        if (sectorId == null || fecha == null) {
+            return List.of();
+        }
+
+        // Verificar que la fecha no sea anterior a hoy
+        if (fecha.isBefore(LocalDate.now())) {
+            return List.of();
+        }
+
+        DayOfWeek diaSemana = fecha.getDayOfWeek();
+
+        // Obtener horarios del día
+        List<HorarioAtencion> horariosDelDia = listarPorDia(sectorId, diaSemana);
+
+        if (horariosDelDia.isEmpty()) {
+            return List.of();
+        }
+
+        // Generar todos los horarios posibles
+        Set<LocalTime> horariosSet = new HashSet<>();
+
+        for (HorarioAtencion horario : horariosDelDia) {
+            if (horario.estaActivo()) {
+                List<LocalTime> horariosDisponibles = horario.getHorariosDisponibles();
+                horariosSet.addAll(horariosDisponibles);
+            }
+        }
+
+        return horariosSet.stream()
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
+
+
+
+
+
+
+
+
+
+
 
     //Método adicional para actualizar horarios existentes
     public HorarioAtencion actualizar(Long horarioId, LocalTime horaInicio, LocalTime horaFin,

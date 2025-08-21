@@ -11,6 +11,7 @@ import queue_san_antonio.queues.models.Turno;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,6 +62,17 @@ public interface TurnoRepository extends JpaRepository<Turno, Long> {
     // Para estadísticas - turnos entre fechas
     @Query("SELECT t FROM Turno t WHERE t.fechaHoraGeneracion BETWEEN :inicio AND :fin")
     List<Turno> findTurnosEntreFechas(@Param("inicio") LocalDateTime inicio, @Param("fin") LocalDateTime fin);
+
+    // Verificar si existe turno especial en fecha y hora específica
+    @Query("SELECT COUNT(t) > 0 FROM Turno t WHERE t.sector.id = :sectorId AND t.fechaCita = :fechaCita AND t.horaCita = :horaCita AND t.estado NOT IN ('CANCELADO', 'AUSENTE')")
+    boolean existeTurnoEspecial(@Param("sectorId") Long sectorId,
+                                @Param("fechaCita") LocalDate fechaCita,
+                                @Param("horaCita") LocalTime horaCita);
+
+    // Contar turnos especiales en una fecha específica para un sector
+    @Query("SELECT COUNT(t) FROM Turno t WHERE t.sector.id = :sectorId AND t.fechaCita = :fechaCita AND t.estado NOT IN ('CANCELADO', 'AUSENTE')")
+    long contarTurnosEspecialesPorFecha(@Param("sectorId") Long sectorId,
+                                        @Param("fechaCita") LocalDate fechaCita);
 
 
 }
