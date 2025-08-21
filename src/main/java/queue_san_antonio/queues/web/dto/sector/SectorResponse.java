@@ -18,6 +18,9 @@ import java.util.List;
 @AllArgsConstructor
 public class SectorResponse {
 
+    @JsonProperty("id")
+    private Long id;
+
     @JsonProperty("codigo")
     private String codigo;
 

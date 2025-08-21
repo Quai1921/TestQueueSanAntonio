@@ -67,6 +67,7 @@ public class SectorMapper {
         if (sector == null) return null;
 
         return SectorResponse.builder()
+                .id(sector.getId())
                 .codigo(sector.getCodigo())
                 .nombre(sector.getNombre())
                 .nombreCompleto(sector.getNombreCompleto())
@@ -81,7 +82,7 @@ public class SectorMapper {
                 .observaciones(sector.getObservaciones())
                 .fechaCreacion(sector.getFechaCreacion())
                 .responsable(toResponsableInfo(sector))
-                .cantidadEmpleados(sector.getCantidadEmpleadosActivos())
+                .cantidadEmpleados(sector.getOperadores().size())
                 .turnosPendientes(sector.getTurnosPendientes())
                 .turnosAtendidos(sector.getTurnosAtendidos())
                 .operadores(toOperadoresInfo(sector))
