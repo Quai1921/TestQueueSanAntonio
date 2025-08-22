@@ -258,8 +258,29 @@ public class HorarioAtencionServiceImpl implements HorarioAtencionService {
         // Obtener el día de la semana de la fecha
         DayOfWeek diaSemana = fecha.getDayOfWeek();
 
+        // Obtener horarios del día
+        List<HorarioAtencion> horariosDelDia = listarPorDia(sectorId, diaSemana);
+
+        if (horariosDelDia.isEmpty()) {
+            return false;
+        }
+
+        // Verificar si la hora está en alguno de los horarios disponibles configurados
+        for (HorarioAtencion horario : horariosDelDia) {
+            if (horario.estaActivo()) {
+                // Obtener todos los horarios disponibles según el intervalo
+                List<LocalTime> horariosDisponibles = horario.getHorariosDisponibles();
+
+                // Verificar si la hora solicitada coincide exactamente con un horario disponible
+                if (horariosDisponibles.contains(hora)) {
+                    return true;
+                }
+            }
+        }
+
         // Verificar si está en horario de atención
-        return estaEnHorarioAtencion(sectorId, diaSemana, hora);
+//        return estaEnHorarioAtencion(sectorId, diaSemana, hora);
+        return false;
     }
 
     @Override

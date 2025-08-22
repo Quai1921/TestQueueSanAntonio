@@ -14,6 +14,7 @@ import queue_san_antonio.queues.services.EstadisticaTurnoService;
 import queue_san_antonio.queues.services.HistorialTurnoService;
 import queue_san_antonio.queues.services.HorarioAtencionService;
 import queue_san_antonio.queues.services.TurnoService;
+import queue_san_antonio.queues.utils.DiaSemanaUtil;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -489,9 +490,9 @@ public class TurnoServiceImpl implements TurnoService {
         }
 
         // Validar que no tenga turnos pendientes
-        if (ciudadanoTieneTurnoPendiente(ciudadano.getId())) {
-            throw new IllegalStateException("El ciudadano ya tiene un turno pendiente");
-        }
+//        if (ciudadanoTieneTurnoPendiente(ciudadano.getId())) {
+//            throw new IllegalStateException("El ciudadano ya tiene un turno pendiente");
+//        }
 
         // Validar sector especial
         if (sector.esEspecial() && tipo != TipoTurno.ESPECIAL) {
@@ -534,7 +535,15 @@ public class TurnoServiceImpl implements TurnoService {
             throw new IllegalStateException("Solo se puede iniciar atención de turnos llamados. Estado actual: " + turno.getEstado());
         }
 
-        validarLlamadoTurno(turno, empleado); // Reutilizar validaciones
+        if (!empleado.puedeAcceder()) {
+            throw new IllegalStateException("El empleado no está activo");
+        }
+
+        if (!empleado.esAdministrador() &&
+                !empleado.perteneceASector(turno.getSector().getId()) &&
+                !empleado.esResponsableDeSector(turno.getSector().getId())) {
+            throw new IllegalStateException("El empleado no tiene permisos para atender turnos del sector " + turno.getSector().getCodigo());
+        }
     }
 
     private void validarRedireccion(Turno turno, Sector nuevoSector, Empleado empleado) {
@@ -564,9 +573,10 @@ public class TurnoServiceImpl implements TurnoService {
         // 2. Validar que la fecha y hora estén en los horarios configurados
         if (!horarioAtencionService.validarFechaHoraTurnoEspecial(sectorId, fechaCita, horaCita)) {
             DayOfWeek diaSemana = fechaCita.getDayOfWeek();
+            String diaSemanaEspanol = DiaSemanaUtil.toEspanol(diaSemana);
             throw new IllegalArgumentException(
                     String.format("No hay atención disponible para %s a las %s en el día %s",
-                            fechaCita, horaCita, diaSemana)
+                            fechaCita, horaCita, diaSemanaEspanol)
             );
         }
 
