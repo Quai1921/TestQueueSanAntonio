@@ -21,12 +21,12 @@ public interface TurnoRepository extends JpaRepository<Turno, Long> {
     // Buscar por código
     Optional<Turno> findByCodigo(String codigo);
 
-    // Turnos activos de un sector (cola de espera)
-    @Query("SELECT t FROM Turno t WHERE t.sector.id = :sectorId AND t.estado IN ('GENERADO', 'LLAMADO', 'EN_ATENCION') ORDER BY t.prioridad DESC, t.fechaHoraGeneracion ASC")
+    // Turnos activos de un sector (cola de espera) - INCLUIR REDIRIGIDO
+    @Query("SELECT t FROM Turno t WHERE t.sector.id = :sectorId AND t.estado IN ('GENERADO', 'LLAMADO', 'EN_ATENCION', 'REDIRIGIDO') ORDER BY t.prioridad DESC, t.fechaHoraGeneracion ASC")
     List<Turno> findTurnosActivosBySector(@Param("sectorId") Long sectorId);
 
-    // Próximo turno a llamar de un sector
-    @Query("SELECT t FROM Turno t WHERE t.sector.id = :sectorId AND t.estado = 'GENERADO' ORDER BY t.prioridad DESC, t.fechaHoraGeneracion ASC")
+    // Próximo turno a llamar de un sector - INCLUIR REDIRIGIDO
+    @Query("SELECT t FROM Turno t WHERE t.sector.id = :sectorId AND t.estado IN ('GENERADO', 'REDIRIGIDO') ORDER BY t.prioridad DESC, t.fechaHoraGeneracion ASC")
     List<Turno> findProximoTurnoSector(@Param("sectorId") Long sectorId);
 
     // Turnos del día por sector
@@ -47,8 +47,8 @@ public interface TurnoRepository extends JpaRepository<Turno, Long> {
     // Turnos de un ciudadano
     List<Turno> findByCiudadanoIdOrderByFechaHoraGeneracionDesc(Long ciudadanoId);
 
-    // Turnos pendientes de un ciudadano
-    @Query("SELECT t FROM Turno t WHERE t.ciudadano.id = :ciudadanoId AND t.estado IN ('GENERADO', 'LLAMADO', 'EN_ATENCION')")
+    // Turnos pendientes de un ciudadano - INCLUIR REDIRIGIDO
+    @Query("SELECT t FROM Turno t WHERE t.ciudadano.id = :ciudadanoId AND t.estado IN ('GENERADO', 'LLAMADO', 'EN_ATENCION', 'REDIRIGIDO')")
     List<Turno> findTurnosPendientesByCiudadano(@Param("ciudadanoId") Long ciudadanoId);
 
     // Para estadísticas - turnos del día

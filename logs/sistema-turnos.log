@@ -14873,3 +14873,2845 @@
     where
         s1_0.id=?
 2025-08-21 21:31:27 [http-nio-8080-exec-2] INFO  q.q.web.controllers.TurnoController - Atención iniciada para turno: REN001
+2025-08-21 21:33:40 [http-nio-8080-exec-5] DEBUG q.q.security.jwt.JwtRequestFilter - Token JWT procesado para usuario: quai
+2025-08-21 21:33:40 [http-nio-8080-exec-5] DEBUG q.q.s.u.EmpleadoUserDetailsService - Cargando detalles del usuario: quai
+2025-08-21 21:33:40 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        e1_0.id,
+        e1_0.activo,
+        e1_0.apellido,
+        e1_0.dni,
+        e1_0.email,
+        e1_0.fecha_actualizacion,
+        e1_0.fecha_creacion,
+        e1_0.nombre,
+        e1_0.password,
+        e1_0.rol,
+        e1_0.sector_id,
+        e1_0.ultimo_acceso,
+        e1_0.username 
+    from
+        empleados e1_0 
+    where
+        e1_0.username=?
+2025-08-21 21:33:40 [http-nio-8080-exec-5] DEBUG q.q.s.u.EmpleadoUserDetailsService - Usuario encontrado: quai - Rol: ADMIN - Activo: true
+2025-08-21 21:33:40 [http-nio-8080-exec-5] DEBUG q.q.s.u.EmpleadoUserDetailsService - Autoridades asignadas a quai: [ROLE_ADMIN, PERMISSION_ADMIN_ALL, PERMISSION_MANAGE_EMPLOYEES, PERMISSION_MANAGE_SECTORS, PERMISSION_VIEW_STATISTICS, PERMISSION_MANAGE_CONFIGURATION, PERMISSION_MANAGE_MESSAGES, PERMISSION_MANAGE_SCHEDULES, PERMISSION_ATTEND_TURNS, PERMISSION_REDIRECT_TURNS, PERMISSION_VIEW_AUDIT]
+2025-08-21 21:33:40 [http-nio-8080-exec-5] DEBUG q.q.security.jwt.JwtRequestFilter - Autenticación establecida para usuario: quai
+2025-08-21 21:33:40 [http-nio-8080-exec-5] INFO  q.q.web.controllers.TurnoController - Redirigiendo turno ID: 6 al sector: 3
+2025-08-21 21:33:40 [http-nio-8080-exec-5] DEBUG q.q.web.controllers.TurnoController - ID del empleado extraído del JWT: 1
+2025-08-21 21:33:40 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL - 
+    select
+        s1_0.id,
+        s1_0.activo,
+        s1_0.capacidad_maxima,
+        s1_0.codigo,
+        s1_0.color,
+        s1_0.descripcion,
+        s1_0.fecha_actualizacion,
+        s1_0.fecha_creacion,
+        s1_0.nombre,
+        s1_0.observaciones,
+        s1_0.orden_visualizacion,
+        s1_0.requiere_cita_previa,
+        s1_0.responsable_id,
+        s1_0.tiempo_estimado_atencion,
+        s1_0.tipo_sector 
+    from
+        sectores s1_0 
+    where
+        s1_0.id=?
+2025-08-21 21:33:40 [http-nio-8080-exec-5] INFO  q.q.services.impl.TurnoServiceImpl - Empleado 1 redirigiendo turno 6 al sector 3 - Motivo: Trámite corresponde a otro sector
+2025-08-21 21:33:40 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.id=?
+2025-08-21 21:33:40 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL - 
+    select
+        e1_0.id,
+        e1_0.activo,
+        e1_0.apellido,
+        e1_0.dni,
+        e1_0.email,
+        e1_0.fecha_actualizacion,
+        e1_0.fecha_creacion,
+        e1_0.nombre,
+        e1_0.password,
+        e1_0.rol,
+        e1_0.sector_id,
+        e1_0.ultimo_acceso,
+        e1_0.username 
+    from
+        empleados e1_0 
+    where
+        e1_0.id=?
+2025-08-21 21:33:40 [http-nio-8080-exec-5] DEBUG q.q.services.impl.TurnoServiceImpl - Guardando turno: INT001
+2025-08-21 21:33:40 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL - 
+    select
+        s1_0.id,
+        s1_0.activo,
+        s1_0.capacidad_maxima,
+        s1_0.codigo,
+        s1_0.color,
+        s1_0.descripcion,
+        s1_0.fecha_actualizacion,
+        s1_0.fecha_creacion,
+        s1_0.nombre,
+        s1_0.observaciones,
+        s1_0.orden_visualizacion,
+        s1_0.requiere_cita_previa,
+        s1_0.responsable_id,
+        s1_0.tiempo_estimado_atencion,
+        s1_0.tipo_sector 
+    from
+        sectores s1_0 
+    where
+        s1_0.id=?
+2025-08-21 21:33:40 [http-nio-8080-exec-5] DEBUG q.q.s.impl.HistorialTurnoServiceImpl - Registrando redirección del turno: INT001 de INT a CON por empleado: quai - Motivo: Trámite corresponde a otro sector
+2025-08-21 21:33:40 [http-nio-8080-exec-5] DEBUG q.q.s.impl.HistorialTurnoServiceImpl - Guardando registro de historial para turno: INT001
+2025-08-21 21:33:40 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL - 
+    /* insert for
+        queue_san_antonio.queues.models.HistorialTurno */insert 
+    into
+        historial_turnos (accion, empleado_id, estado_anterior, estado_nuevo, fecha_hora, motivo, observaciones, prioridad_anterior, prioridad_nueva, sector_destino_id, sector_origen_id, turno_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-08-21 21:33:40 [http-nio-8080-exec-5] INFO  q.q.s.impl.HistorialTurnoServiceImpl - Redirección registrada: turno INT001 redirigido de INT a CON por quai - Motivo: Trámite corresponde a otro sector
+2025-08-21 21:33:40 [http-nio-8080-exec-5] DEBUG q.q.s.i.EstadisticaTurnoServiceImpl - Obteniendo estadística del día 2025-08-21 para sector 1
+2025-08-21 21:33:40 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        et1_0.id,
+        et1_0.cantidad_pico,
+        et1_0.empleado_id,
+        et1_0.fecha,
+        et1_0.fecha_actualizacion,
+        et1_0.hora_pico,
+        et1_0.sector_id,
+        et1_0.tiempo_maximo_espera,
+        et1_0.tiempo_minimo_espera,
+        et1_0.tiempo_promedio_atencion,
+        et1_0.tiempo_promedio_espera,
+        et1_0.tiempo_total_atencion,
+        et1_0.turnos_atendidos,
+        et1_0.turnos_ausentes,
+        et1_0.turnos_cancelados,
+        et1_0.turnos_generados,
+        et1_0.turnos_redirigidos 
+    from
+        estadisticas_turnos et1_0 
+    join
+        sectores s1_0 
+            on s1_0.id=et1_0.sector_id 
+    where
+        et1_0.fecha=? 
+        and s1_0.id=? 
+        and et1_0.empleado_id is null
+2025-08-21 21:33:40 [http-nio-8080-exec-5] DEBUG q.q.s.i.EstadisticaTurnoServiceImpl - Guardando estadística para sector: INT - fecha: 2025-08-21 - empleado: General
+2025-08-21 21:33:40 [http-nio-8080-exec-5] DEBUG q.q.s.i.EstadisticaTurnoServiceImpl - Obteniendo estadística del empleado 1 en sector 1 para fecha 2025-08-21
+2025-08-21 21:33:40 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL - 
+    /* update
+        for queue_san_antonio.queues.models.Turno */update turnos 
+    set
+        ciudadano_id=?,
+        codigo=?,
+        empleado_atencion_id=?,
+        estado=?,
+        fecha_actualizacion=?,
+        fecha_cita=?,
+        fecha_hora_atencion=?,
+        fecha_hora_finalizacion=?,
+        fecha_hora_llamado=?,
+        hora_cita=?,
+        motivo_redireccion=?,
+        numero_orden=?,
+        observaciones=?,
+        prioridad=?,
+        sector_id=?,
+        sector_original_id=?,
+        tipo=? 
+    where
+        id=?
+2025-08-21 21:33:40 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL - 
+    /* update
+        for queue_san_antonio.queues.models.EstadisticaTurno */update estadisticas_turnos 
+    set
+        cantidad_pico=?,
+        empleado_id=?,
+        fecha=?,
+        fecha_actualizacion=?,
+        hora_pico=?,
+        sector_id=?,
+        tiempo_maximo_espera=?,
+        tiempo_minimo_espera=?,
+        tiempo_promedio_atencion=?,
+        tiempo_promedio_espera=?,
+        tiempo_total_atencion=?,
+        turnos_atendidos=?,
+        turnos_ausentes=?,
+        turnos_cancelados=?,
+        turnos_generados=?,
+        turnos_redirigidos=? 
+    where
+        id=?
+2025-08-21 21:33:40 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        et1_0.id,
+        et1_0.cantidad_pico,
+        et1_0.empleado_id,
+        et1_0.fecha,
+        et1_0.fecha_actualizacion,
+        et1_0.hora_pico,
+        et1_0.sector_id,
+        et1_0.tiempo_maximo_espera,
+        et1_0.tiempo_minimo_espera,
+        et1_0.tiempo_promedio_atencion,
+        et1_0.tiempo_promedio_espera,
+        et1_0.tiempo_total_atencion,
+        et1_0.turnos_atendidos,
+        et1_0.turnos_ausentes,
+        et1_0.turnos_cancelados,
+        et1_0.turnos_generados,
+        et1_0.turnos_redirigidos 
+    from
+        estadisticas_turnos et1_0 
+    join
+        sectores s1_0 
+            on s1_0.id=et1_0.sector_id 
+    left join
+        empleados e1_0 
+            on e1_0.id=et1_0.empleado_id 
+    where
+        et1_0.fecha=? 
+        and s1_0.id=? 
+        and e1_0.id=?
+2025-08-21 21:33:40 [http-nio-8080-exec-5] DEBUG q.q.s.i.EstadisticaTurnoServiceImpl - Guardando estadística para sector: INT - fecha: 2025-08-21 - empleado: quai
+2025-08-21 21:33:40 [http-nio-8080-exec-5] INFO  q.q.services.impl.TurnoServiceImpl - Turno INT001 redirigido exitosamente de INT a CON por empleado quai
+2025-08-21 21:33:40 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL - 
+    /* update
+        for queue_san_antonio.queues.models.EstadisticaTurno */update estadisticas_turnos 
+    set
+        cantidad_pico=?,
+        empleado_id=?,
+        fecha=?,
+        fecha_actualizacion=?,
+        hora_pico=?,
+        sector_id=?,
+        tiempo_maximo_espera=?,
+        tiempo_minimo_espera=?,
+        tiempo_promedio_atencion=?,
+        tiempo_promedio_espera=?,
+        tiempo_total_atencion=?,
+        turnos_atendidos=?,
+        turnos_ausentes=?,
+        turnos_cancelados=?,
+        turnos_generados=?,
+        turnos_redirigidos=? 
+    where
+        id=?
+2025-08-21 21:33:40 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL - 
+    select
+        c1_0.id,
+        c1_0.apellido,
+        c1_0.direccion,
+        c1_0.dni,
+        c1_0.es_prioritario,
+        c1_0.fecha_actualizacion,
+        c1_0.fecha_registro,
+        c1_0.motivo_prioridad,
+        c1_0.nombre,
+        c1_0.observaciones,
+        c1_0.telefono 
+    from
+        ciudadanos c1_0 
+    where
+        c1_0.id=?
+2025-08-21 21:33:40 [http-nio-8080-exec-5] INFO  q.q.web.controllers.TurnoController - Turno INT001 redirigido exitosamente al sector CON
+2025-08-21 21:34:39 [http-nio-8080-exec-6] DEBUG q.q.security.jwt.JwtRequestFilter - Token JWT procesado para usuario: quai
+2025-08-21 21:34:39 [http-nio-8080-exec-6] DEBUG q.q.s.u.EmpleadoUserDetailsService - Cargando detalles del usuario: quai
+2025-08-21 21:34:39 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        e1_0.id,
+        e1_0.activo,
+        e1_0.apellido,
+        e1_0.dni,
+        e1_0.email,
+        e1_0.fecha_actualizacion,
+        e1_0.fecha_creacion,
+        e1_0.nombre,
+        e1_0.password,
+        e1_0.rol,
+        e1_0.sector_id,
+        e1_0.ultimo_acceso,
+        e1_0.username 
+    from
+        empleados e1_0 
+    where
+        e1_0.username=?
+2025-08-21 21:34:39 [http-nio-8080-exec-6] DEBUG q.q.s.u.EmpleadoUserDetailsService - Usuario encontrado: quai - Rol: ADMIN - Activo: true
+2025-08-21 21:34:39 [http-nio-8080-exec-6] DEBUG q.q.s.u.EmpleadoUserDetailsService - Autoridades asignadas a quai: [ROLE_ADMIN, PERMISSION_ADMIN_ALL, PERMISSION_MANAGE_EMPLOYEES, PERMISSION_MANAGE_SECTORS, PERMISSION_VIEW_STATISTICS, PERMISSION_MANAGE_CONFIGURATION, PERMISSION_MANAGE_MESSAGES, PERMISSION_MANAGE_SCHEDULES, PERMISSION_ATTEND_TURNS, PERMISSION_REDIRECT_TURNS, PERMISSION_VIEW_AUDIT]
+2025-08-21 21:34:39 [http-nio-8080-exec-6] DEBUG q.q.security.jwt.JwtRequestFilter - Autenticación establecida para usuario: quai
+2025-08-21 21:34:39 [http-nio-8080-exec-6] INFO  q.q.web.controllers.TurnoController - Redirigiendo turno ID: 1 al sector: 3
+2025-08-21 21:34:39 [http-nio-8080-exec-6] DEBUG q.q.web.controllers.TurnoController - ID del empleado extraído del JWT: 1
+2025-08-21 21:34:39 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    select
+        s1_0.id,
+        s1_0.activo,
+        s1_0.capacidad_maxima,
+        s1_0.codigo,
+        s1_0.color,
+        s1_0.descripcion,
+        s1_0.fecha_actualizacion,
+        s1_0.fecha_creacion,
+        s1_0.nombre,
+        s1_0.observaciones,
+        s1_0.orden_visualizacion,
+        s1_0.requiere_cita_previa,
+        s1_0.responsable_id,
+        s1_0.tiempo_estimado_atencion,
+        s1_0.tipo_sector 
+    from
+        sectores s1_0 
+    where
+        s1_0.id=?
+2025-08-21 21:34:39 [http-nio-8080-exec-6] INFO  q.q.services.impl.TurnoServiceImpl - Empleado 1 redirigiendo turno 1 al sector 3 - Motivo: Trámite corresponde a otro sector
+2025-08-21 21:34:39 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.id=?
+2025-08-21 21:34:39 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    select
+        e1_0.id,
+        e1_0.activo,
+        e1_0.apellido,
+        e1_0.dni,
+        e1_0.email,
+        e1_0.fecha_actualizacion,
+        e1_0.fecha_creacion,
+        e1_0.nombre,
+        e1_0.password,
+        e1_0.rol,
+        e1_0.sector_id,
+        e1_0.ultimo_acceso,
+        e1_0.username 
+    from
+        empleados e1_0 
+    where
+        e1_0.id=?
+2025-08-21 21:34:39 [http-nio-8080-exec-6] DEBUG q.q.services.impl.TurnoServiceImpl - Guardando turno: REN001
+2025-08-21 21:34:39 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    select
+        s1_0.id,
+        s1_0.activo,
+        s1_0.capacidad_maxima,
+        s1_0.codigo,
+        s1_0.color,
+        s1_0.descripcion,
+        s1_0.fecha_actualizacion,
+        s1_0.fecha_creacion,
+        s1_0.nombre,
+        s1_0.observaciones,
+        s1_0.orden_visualizacion,
+        s1_0.requiere_cita_previa,
+        s1_0.responsable_id,
+        s1_0.tiempo_estimado_atencion,
+        s1_0.tipo_sector 
+    from
+        sectores s1_0 
+    where
+        s1_0.id=?
+2025-08-21 21:34:39 [http-nio-8080-exec-6] DEBUG q.q.s.impl.HistorialTurnoServiceImpl - Registrando redirección del turno: REN001 de REN a CON por empleado: quai - Motivo: Trámite corresponde a otro sector
+2025-08-21 21:34:39 [http-nio-8080-exec-6] DEBUG q.q.s.impl.HistorialTurnoServiceImpl - Guardando registro de historial para turno: REN001
+2025-08-21 21:34:39 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    /* insert for
+        queue_san_antonio.queues.models.HistorialTurno */insert 
+    into
+        historial_turnos (accion, empleado_id, estado_anterior, estado_nuevo, fecha_hora, motivo, observaciones, prioridad_anterior, prioridad_nueva, sector_destino_id, sector_origen_id, turno_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-08-21 21:34:39 [http-nio-8080-exec-6] INFO  q.q.s.impl.HistorialTurnoServiceImpl - Redirección registrada: turno REN001 redirigido de REN a CON por quai - Motivo: Trámite corresponde a otro sector
+2025-08-21 21:34:39 [http-nio-8080-exec-6] DEBUG q.q.s.i.EstadisticaTurnoServiceImpl - Obteniendo estadística del día 2025-08-21 para sector 2
+2025-08-21 21:34:39 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        et1_0.id,
+        et1_0.cantidad_pico,
+        et1_0.empleado_id,
+        et1_0.fecha,
+        et1_0.fecha_actualizacion,
+        et1_0.hora_pico,
+        et1_0.sector_id,
+        et1_0.tiempo_maximo_espera,
+        et1_0.tiempo_minimo_espera,
+        et1_0.tiempo_promedio_atencion,
+        et1_0.tiempo_promedio_espera,
+        et1_0.tiempo_total_atencion,
+        et1_0.turnos_atendidos,
+        et1_0.turnos_ausentes,
+        et1_0.turnos_cancelados,
+        et1_0.turnos_generados,
+        et1_0.turnos_redirigidos 
+    from
+        estadisticas_turnos et1_0 
+    join
+        sectores s1_0 
+            on s1_0.id=et1_0.sector_id 
+    where
+        et1_0.fecha=? 
+        and s1_0.id=? 
+        and et1_0.empleado_id is null
+2025-08-21 21:34:39 [http-nio-8080-exec-6] DEBUG q.q.s.i.EstadisticaTurnoServiceImpl - Guardando estadística para sector: REN - fecha: 2025-08-21 - empleado: General
+2025-08-21 21:34:39 [http-nio-8080-exec-6] DEBUG q.q.s.i.EstadisticaTurnoServiceImpl - Obteniendo estadística del empleado 1 en sector 2 para fecha 2025-08-21
+2025-08-21 21:34:39 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    /* update
+        for queue_san_antonio.queues.models.Turno */update turnos 
+    set
+        ciudadano_id=?,
+        codigo=?,
+        empleado_atencion_id=?,
+        estado=?,
+        fecha_actualizacion=?,
+        fecha_cita=?,
+        fecha_hora_atencion=?,
+        fecha_hora_finalizacion=?,
+        fecha_hora_llamado=?,
+        hora_cita=?,
+        motivo_redireccion=?,
+        numero_orden=?,
+        observaciones=?,
+        prioridad=?,
+        sector_id=?,
+        sector_original_id=?,
+        tipo=? 
+    where
+        id=?
+2025-08-21 21:34:39 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    /* update
+        for queue_san_antonio.queues.models.EstadisticaTurno */update estadisticas_turnos 
+    set
+        cantidad_pico=?,
+        empleado_id=?,
+        fecha=?,
+        fecha_actualizacion=?,
+        hora_pico=?,
+        sector_id=?,
+        tiempo_maximo_espera=?,
+        tiempo_minimo_espera=?,
+        tiempo_promedio_atencion=?,
+        tiempo_promedio_espera=?,
+        tiempo_total_atencion=?,
+        turnos_atendidos=?,
+        turnos_ausentes=?,
+        turnos_cancelados=?,
+        turnos_generados=?,
+        turnos_redirigidos=? 
+    where
+        id=?
+2025-08-21 21:34:39 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        et1_0.id,
+        et1_0.cantidad_pico,
+        et1_0.empleado_id,
+        et1_0.fecha,
+        et1_0.fecha_actualizacion,
+        et1_0.hora_pico,
+        et1_0.sector_id,
+        et1_0.tiempo_maximo_espera,
+        et1_0.tiempo_minimo_espera,
+        et1_0.tiempo_promedio_atencion,
+        et1_0.tiempo_promedio_espera,
+        et1_0.tiempo_total_atencion,
+        et1_0.turnos_atendidos,
+        et1_0.turnos_ausentes,
+        et1_0.turnos_cancelados,
+        et1_0.turnos_generados,
+        et1_0.turnos_redirigidos 
+    from
+        estadisticas_turnos et1_0 
+    join
+        sectores s1_0 
+            on s1_0.id=et1_0.sector_id 
+    left join
+        empleados e1_0 
+            on e1_0.id=et1_0.empleado_id 
+    where
+        et1_0.fecha=? 
+        and s1_0.id=? 
+        and e1_0.id=?
+2025-08-21 21:34:39 [http-nio-8080-exec-6] DEBUG q.q.s.i.EstadisticaTurnoServiceImpl - Guardando estadística para sector: REN - fecha: 2025-08-21 - empleado: quai
+2025-08-21 21:34:39 [http-nio-8080-exec-6] INFO  q.q.services.impl.TurnoServiceImpl - Turno REN001 redirigido exitosamente de REN a CON por empleado quai
+2025-08-21 21:34:39 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    /* update
+        for queue_san_antonio.queues.models.EstadisticaTurno */update estadisticas_turnos 
+    set
+        cantidad_pico=?,
+        empleado_id=?,
+        fecha=?,
+        fecha_actualizacion=?,
+        hora_pico=?,
+        sector_id=?,
+        tiempo_maximo_espera=?,
+        tiempo_minimo_espera=?,
+        tiempo_promedio_atencion=?,
+        tiempo_promedio_espera=?,
+        tiempo_total_atencion=?,
+        turnos_atendidos=?,
+        turnos_ausentes=?,
+        turnos_cancelados=?,
+        turnos_generados=?,
+        turnos_redirigidos=? 
+    where
+        id=?
+2025-08-21 21:34:39 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    select
+        c1_0.id,
+        c1_0.apellido,
+        c1_0.direccion,
+        c1_0.dni,
+        c1_0.es_prioritario,
+        c1_0.fecha_actualizacion,
+        c1_0.fecha_registro,
+        c1_0.motivo_prioridad,
+        c1_0.nombre,
+        c1_0.observaciones,
+        c1_0.telefono 
+    from
+        ciudadanos c1_0 
+    where
+        c1_0.id=?
+2025-08-21 21:34:39 [http-nio-8080-exec-6] INFO  q.q.web.controllers.TurnoController - Turno REN001 redirigido exitosamente al sector CON
+2025-08-21 21:35:04 [http-nio-8080-exec-7] DEBUG q.q.security.jwt.JwtRequestFilter - Token JWT procesado para usuario: quai
+2025-08-21 21:35:04 [http-nio-8080-exec-7] DEBUG q.q.s.u.EmpleadoUserDetailsService - Cargando detalles del usuario: quai
+2025-08-21 21:35:04 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        e1_0.id,
+        e1_0.activo,
+        e1_0.apellido,
+        e1_0.dni,
+        e1_0.email,
+        e1_0.fecha_actualizacion,
+        e1_0.fecha_creacion,
+        e1_0.nombre,
+        e1_0.password,
+        e1_0.rol,
+        e1_0.sector_id,
+        e1_0.ultimo_acceso,
+        e1_0.username 
+    from
+        empleados e1_0 
+    where
+        e1_0.username=?
+2025-08-21 21:35:04 [http-nio-8080-exec-7] DEBUG q.q.s.u.EmpleadoUserDetailsService - Usuario encontrado: quai - Rol: ADMIN - Activo: true
+2025-08-21 21:35:04 [http-nio-8080-exec-7] DEBUG q.q.s.u.EmpleadoUserDetailsService - Autoridades asignadas a quai: [ROLE_ADMIN, PERMISSION_ADMIN_ALL, PERMISSION_MANAGE_EMPLOYEES, PERMISSION_MANAGE_SECTORS, PERMISSION_VIEW_STATISTICS, PERMISSION_MANAGE_CONFIGURATION, PERMISSION_MANAGE_MESSAGES, PERMISSION_MANAGE_SCHEDULES, PERMISSION_ATTEND_TURNS, PERMISSION_REDIRECT_TURNS, PERMISSION_VIEW_AUDIT]
+2025-08-21 21:35:04 [http-nio-8080-exec-7] DEBUG q.q.security.jwt.JwtRequestFilter - Autenticación establecida para usuario: quai
+2025-08-21 21:35:04 [http-nio-8080-exec-7] INFO  q.q.web.controllers.TurnoController - Llamando turno ID: 1
+2025-08-21 21:35:04 [http-nio-8080-exec-7] DEBUG q.q.web.controllers.TurnoController - ID del empleado extraído del JWT: 1
+2025-08-21 21:35:04 [http-nio-8080-exec-7] INFO  q.q.services.impl.TurnoServiceImpl - Empleado 1 llamando turno 1
+2025-08-21 21:35:04 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.id=?
+2025-08-21 21:35:04 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - 
+    select
+        e1_0.id,
+        e1_0.activo,
+        e1_0.apellido,
+        e1_0.dni,
+        e1_0.email,
+        e1_0.fecha_actualizacion,
+        e1_0.fecha_creacion,
+        e1_0.nombre,
+        e1_0.password,
+        e1_0.rol,
+        e1_0.sector_id,
+        e1_0.ultimo_acceso,
+        e1_0.username 
+    from
+        empleados e1_0 
+    where
+        e1_0.id=?
+2025-08-21 21:35:04 [http-nio-8080-exec-7] WARN  q.q.web.controllers.TurnoController - Error llamando turno 1: Solo se pueden llamar turnos en estado GENERADO. Estado actual: REDIRIGIDO
+2025-08-21 21:41:16 [restartedMain] INFO  q.queues.QueuesApplication - Starting QueuesApplication using Java 24.0.1 with PID 3460 (E:\Desktop\San Antonio Test\Queues-SanAntonio\Queues-Back-San-Antonio\build\classes\java\main started by Quai in E:\Desktop\San Antonio Test\Queues-SanAntonio\Queues-Back-San-Antonio)
+2025-08-21 21:41:16 [restartedMain] DEBUG q.queues.QueuesApplication - Running with Spring Boot v3.5.4, Spring v6.2.9
+2025-08-21 21:41:16 [restartedMain] INFO  q.queues.QueuesApplication - No active profile set, falling back to 1 default profile: "default"
+2025-08-21 21:41:16 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-08-21 21:41:16 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-08-21 21:41:17 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-08-21 21:41:17 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 81 ms. Found 9 JPA repository interfaces.
+2025-08-21 21:41:17 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2025-08-21 21:41:17 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-08-21 21:41:17 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.43]
+2025-08-21 21:41:17 [restartedMain] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-08-21 21:41:17 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1427 ms
+2025-08-21 21:41:17 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-08-21 21:41:18 [restartedMain] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@1369210e
+2025-08-21 21:41:18 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-08-21 21:41:18 [restartedMain] INFO  org.flywaydb.core.FlywayExecutor - Database: jdbc:postgresql://localhost:5432/turnosPresencial (PostgreSQL 17.0)
+2025-08-21 21:41:18 [restartedMain] INFO  o.f.core.internal.command.DbValidate - Successfully validated 0 migrations (execution time 00:00.008s)
+2025-08-21 21:41:18 [restartedMain] WARN  o.f.core.internal.command.DbValidate - No migrations found. Are your locations set up correctly?
+2025-08-21 21:41:18 [restartedMain] INFO  o.f.core.internal.command.DbMigrate - Current version of schema "public": << Empty Schema >>
+2025-08-21 21:41:18 [restartedMain] INFO  o.f.core.internal.command.DbMigrate - Schema "public" is up to date. No migration necessary.
+2025-08-21 21:41:18 [restartedMain] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-08-21 21:41:18 [restartedMain] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.22.Final
+2025-08-21 21:41:18 [restartedMain] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2025-08-21 21:41:18 [restartedMain] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-08-21 21:41:18 [restartedMain] WARN  org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-08-21 21:41:18 [restartedMain] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-08-21 21:41:19 [restartedMain] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-21 21:41:19 [restartedMain] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-08-21 21:41:19 [restartedMain] DEBUG q.q.security.jwt.JwtRequestFilter - Filter 'jwtRequestFilter' configured for use
+2025-08-21 21:41:19 [restartedMain] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-08-21 21:41:22 [restartedMain] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2025-08-21 21:41:22 [restartedMain] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-08-21 21:41:22 [restartedMain] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-08-21 21:41:22 [restartedMain] INFO  q.q.s.config.SecurityConfiguration - Configurando cadena de filtros de seguridad
+2025-08-21 21:41:22 [restartedMain] DEBUG q.q.s.config.SecurityConfiguration - Configurando CORS
+2025-08-21 21:41:22 [restartedMain] WARN  o.s.s.c.a.w.c.AuthorizeHttpRequestsConfigurer$AuthorizationManagerRequestMatcherRegistry - One of the patterns in [/api/auth/login, /api/auth/refresh, /api/sectores/publicos, /api/sectores/especiales, api/configuraciones-pantalla/activa, api/mensajes-institucionales/vigentes, api/mensajes-institucionales/configuracion/{configuracionId}, api/turnos/codigo/{codigo}] is missing a leading slash. This is discouraged; please include the leading slash in all your request matcher patterns. In future versions of Spring Security, leaving out the leading slash will result in an exception.
+2025-08-21 21:41:22 [restartedMain] INFO  q.q.s.config.SecurityConfiguration - Configuración de seguridad completada
+2025-08-21 21:41:22 [restartedMain] INFO  org.quartz.impl.StdSchedulerFactory - Using default implementation for ThreadExecutor
+2025-08-21 21:41:22 [restartedMain] INFO  o.quartz.core.SchedulerSignalerImpl - Initialized Scheduler Signaller of type: class org.quartz.core.SchedulerSignalerImpl
+2025-08-21 21:41:22 [restartedMain] INFO  org.quartz.core.QuartzScheduler - Quartz Scheduler v2.5.0 created.
+2025-08-21 21:41:22 [restartedMain] INFO  org.quartz.simpl.RAMJobStore - RAMJobStore initialized.
+2025-08-21 21:41:22 [restartedMain] INFO  org.quartz.core.QuartzScheduler - Scheduler meta-data: Quartz Scheduler (v2.5.0) 'quartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'org.quartz.core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'org.quartz.simpl.SimpleThreadPool' - with 10 threads.
+  Using job-store 'org.quartz.simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+2025-08-21 21:41:22 [restartedMain] INFO  org.quartz.impl.StdSchedulerFactory - Quartz scheduler 'quartzScheduler' initialized from an externally provided properties instance.
+2025-08-21 21:41:22 [restartedMain] INFO  org.quartz.impl.StdSchedulerFactory - Quartz scheduler version: 2.5.0
+2025-08-21 21:41:22 [restartedMain] INFO  org.quartz.core.QuartzScheduler - JobFactory set to: org.springframework.scheduling.quartz.SpringBeanJobFactory@18ccd2d8
+2025-08-21 21:41:22 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2025-08-21 21:41:22 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2025-08-21 21:41:22 [restartedMain] INFO  o.s.s.quartz.SchedulerFactoryBean - Starting Quartz Scheduler now
+2025-08-21 21:41:22 [restartedMain] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED started.
+2025-08-21 21:41:22 [restartedMain] INFO  q.queues.QueuesApplication - Started QueuesApplication in 7.04 seconds (process running for 7.39)
+2025-08-21 21:41:22 [restartedMain] DEBUG org.hibernate.SQL - 
+    /* select
+        count(*) 
+    from
+        Empleado x */ select
+            count(*) 
+        from
+            empleados e1_0
+2025-08-21 21:41:32 [http-nio-8080-exec-2] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-08-21 21:41:32 [http-nio-8080-exec-2] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-08-21 21:41:32 [http-nio-8080-exec-2] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 0 ms
+2025-08-21 21:41:32 [http-nio-8080-exec-2] DEBUG q.q.security.jwt.JwtRequestFilter - Token JWT procesado para usuario: quai
+2025-08-21 21:41:32 [http-nio-8080-exec-2] DEBUG q.q.s.u.EmpleadoUserDetailsService - Cargando detalles del usuario: quai
+2025-08-21 21:41:32 [http-nio-8080-exec-2] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        e1_0.id,
+        e1_0.activo,
+        e1_0.apellido,
+        e1_0.dni,
+        e1_0.email,
+        e1_0.fecha_actualizacion,
+        e1_0.fecha_creacion,
+        e1_0.nombre,
+        e1_0.password,
+        e1_0.rol,
+        e1_0.sector_id,
+        e1_0.ultimo_acceso,
+        e1_0.username 
+    from
+        empleados e1_0 
+    where
+        e1_0.username=?
+2025-08-21 21:41:32 [http-nio-8080-exec-2] DEBUG q.q.s.u.EmpleadoUserDetailsService - Usuario encontrado: quai - Rol: ADMIN - Activo: true
+2025-08-21 21:41:32 [http-nio-8080-exec-2] DEBUG q.q.s.u.EmpleadoUserDetailsService - Autoridades asignadas a quai: [ROLE_ADMIN, PERMISSION_ADMIN_ALL, PERMISSION_MANAGE_EMPLOYEES, PERMISSION_MANAGE_SECTORS, PERMISSION_VIEW_STATISTICS, PERMISSION_MANAGE_CONFIGURATION, PERMISSION_MANAGE_MESSAGES, PERMISSION_MANAGE_SCHEDULES, PERMISSION_ATTEND_TURNS, PERMISSION_REDIRECT_TURNS, PERMISSION_VIEW_AUDIT]
+2025-08-21 21:41:32 [http-nio-8080-exec-2] DEBUG q.q.security.jwt.JwtRequestFilter - Autenticación establecida para usuario: quai
+2025-08-21 21:41:32 [http-nio-8080-exec-2] INFO  q.q.web.controllers.TurnoController - Llamando turno ID: 1
+2025-08-21 21:41:32 [http-nio-8080-exec-2] DEBUG q.q.web.controllers.TurnoController - ID del empleado extraído del JWT: 1
+2025-08-21 21:41:32 [http-nio-8080-exec-2] INFO  q.q.services.impl.TurnoServiceImpl - Empleado 1 llamando turno 1
+2025-08-21 21:41:32 [http-nio-8080-exec-2] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.id=?
+2025-08-21 21:41:32 [http-nio-8080-exec-2] DEBUG org.hibernate.SQL - 
+    select
+        e1_0.id,
+        e1_0.activo,
+        e1_0.apellido,
+        e1_0.dni,
+        e1_0.email,
+        e1_0.fecha_actualizacion,
+        e1_0.fecha_creacion,
+        e1_0.nombre,
+        e1_0.password,
+        e1_0.rol,
+        e1_0.sector_id,
+        e1_0.ultimo_acceso,
+        e1_0.username 
+    from
+        empleados e1_0 
+    where
+        e1_0.id=?
+2025-08-21 21:41:32 [http-nio-8080-exec-2] DEBUG q.q.services.impl.TurnoServiceImpl - Guardando turno: REN001
+2025-08-21 21:41:32 [http-nio-8080-exec-2] DEBUG q.q.s.impl.HistorialTurnoServiceImpl - Registrando llamado del turno: REN001 por empleado: quai
+2025-08-21 21:41:32 [http-nio-8080-exec-2] DEBUG q.q.s.impl.HistorialTurnoServiceImpl - Guardando registro de historial para turno: REN001
+2025-08-21 21:41:32 [http-nio-8080-exec-2] DEBUG org.hibernate.SQL - 
+    /* insert for
+        queue_san_antonio.queues.models.HistorialTurno */insert 
+    into
+        historial_turnos (accion, empleado_id, estado_anterior, estado_nuevo, fecha_hora, motivo, observaciones, prioridad_anterior, prioridad_nueva, sector_destino_id, sector_origen_id, turno_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-08-21 21:41:32 [http-nio-8080-exec-2] INFO  q.q.services.impl.TurnoServiceImpl - Turno REN001 llamado exitosamente por empleado quai
+2025-08-21 21:41:32 [http-nio-8080-exec-2] DEBUG org.hibernate.SQL - 
+    /* update
+        for queue_san_antonio.queues.models.Turno */update turnos 
+    set
+        ciudadano_id=?,
+        codigo=?,
+        empleado_atencion_id=?,
+        estado=?,
+        fecha_actualizacion=?,
+        fecha_cita=?,
+        fecha_hora_atencion=?,
+        fecha_hora_finalizacion=?,
+        fecha_hora_llamado=?,
+        hora_cita=?,
+        motivo_redireccion=?,
+        numero_orden=?,
+        observaciones=?,
+        prioridad=?,
+        sector_id=?,
+        sector_original_id=?,
+        tipo=? 
+    where
+        id=?
+2025-08-21 21:41:32 [http-nio-8080-exec-2] DEBUG org.hibernate.SQL - 
+    select
+        c1_0.id,
+        c1_0.apellido,
+        c1_0.direccion,
+        c1_0.dni,
+        c1_0.es_prioritario,
+        c1_0.fecha_actualizacion,
+        c1_0.fecha_registro,
+        c1_0.motivo_prioridad,
+        c1_0.nombre,
+        c1_0.observaciones,
+        c1_0.telefono 
+    from
+        ciudadanos c1_0 
+    where
+        c1_0.id=?
+2025-08-21 21:41:32 [http-nio-8080-exec-2] DEBUG org.hibernate.SQL - 
+    select
+        s1_0.id,
+        s1_0.activo,
+        s1_0.capacidad_maxima,
+        s1_0.codigo,
+        s1_0.color,
+        s1_0.descripcion,
+        s1_0.fecha_actualizacion,
+        s1_0.fecha_creacion,
+        s1_0.nombre,
+        s1_0.observaciones,
+        s1_0.orden_visualizacion,
+        s1_0.requiere_cita_previa,
+        s1_0.responsable_id,
+        s1_0.tiempo_estimado_atencion,
+        s1_0.tipo_sector 
+    from
+        sectores s1_0 
+    where
+        s1_0.id=?
+2025-08-21 21:41:32 [http-nio-8080-exec-2] INFO  q.q.web.controllers.TurnoController - Turno REN001 llamado exitosamente
+2025-08-21 21:42:02 [http-nio-8080-exec-3] DEBUG q.q.security.jwt.JwtRequestFilter - Token JWT procesado para usuario: quai
+2025-08-21 21:42:02 [http-nio-8080-exec-3] DEBUG q.q.s.u.EmpleadoUserDetailsService - Cargando detalles del usuario: quai
+2025-08-21 21:42:02 [http-nio-8080-exec-3] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        e1_0.id,
+        e1_0.activo,
+        e1_0.apellido,
+        e1_0.dni,
+        e1_0.email,
+        e1_0.fecha_actualizacion,
+        e1_0.fecha_creacion,
+        e1_0.nombre,
+        e1_0.password,
+        e1_0.rol,
+        e1_0.sector_id,
+        e1_0.ultimo_acceso,
+        e1_0.username 
+    from
+        empleados e1_0 
+    where
+        e1_0.username=?
+2025-08-21 21:42:02 [http-nio-8080-exec-3] DEBUG q.q.s.u.EmpleadoUserDetailsService - Usuario encontrado: quai - Rol: ADMIN - Activo: true
+2025-08-21 21:42:02 [http-nio-8080-exec-3] DEBUG q.q.s.u.EmpleadoUserDetailsService - Autoridades asignadas a quai: [ROLE_ADMIN, PERMISSION_ADMIN_ALL, PERMISSION_MANAGE_EMPLOYEES, PERMISSION_MANAGE_SECTORS, PERMISSION_VIEW_STATISTICS, PERMISSION_MANAGE_CONFIGURATION, PERMISSION_MANAGE_MESSAGES, PERMISSION_MANAGE_SCHEDULES, PERMISSION_ATTEND_TURNS, PERMISSION_REDIRECT_TURNS, PERMISSION_VIEW_AUDIT]
+2025-08-21 21:42:02 [http-nio-8080-exec-3] DEBUG q.q.security.jwt.JwtRequestFilter - Autenticación establecida para usuario: quai
+2025-08-21 21:42:02 [http-nio-8080-exec-3] INFO  q.q.web.controllers.TurnoController - Iniciando atención del turno ID: 1
+2025-08-21 21:42:02 [http-nio-8080-exec-3] DEBUG q.q.web.controllers.TurnoController - ID del empleado extraído del JWT: 1
+2025-08-21 21:42:02 [http-nio-8080-exec-3] INFO  q.q.services.impl.TurnoServiceImpl - Empleado 1 iniciando atención del turno 1
+2025-08-21 21:42:02 [http-nio-8080-exec-3] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.id=?
+2025-08-21 21:42:02 [http-nio-8080-exec-3] DEBUG org.hibernate.SQL - 
+    select
+        e1_0.id,
+        e1_0.activo,
+        e1_0.apellido,
+        e1_0.dni,
+        e1_0.email,
+        e1_0.fecha_actualizacion,
+        e1_0.fecha_creacion,
+        e1_0.nombre,
+        e1_0.password,
+        e1_0.rol,
+        e1_0.sector_id,
+        e1_0.ultimo_acceso,
+        e1_0.username 
+    from
+        empleados e1_0 
+    where
+        e1_0.id=?
+2025-08-21 21:42:02 [http-nio-8080-exec-3] DEBUG q.q.services.impl.TurnoServiceImpl - Guardando turno: REN001
+2025-08-21 21:42:02 [http-nio-8080-exec-3] DEBUG q.q.s.impl.HistorialTurnoServiceImpl - Registrando inicio de atención del turno: REN001 por empleado: quai
+2025-08-21 21:42:02 [http-nio-8080-exec-3] DEBUG q.q.s.impl.HistorialTurnoServiceImpl - Guardando registro de historial para turno: REN001
+2025-08-21 21:42:02 [http-nio-8080-exec-3] DEBUG org.hibernate.SQL - 
+    /* insert for
+        queue_san_antonio.queues.models.HistorialTurno */insert 
+    into
+        historial_turnos (accion, empleado_id, estado_anterior, estado_nuevo, fecha_hora, motivo, observaciones, prioridad_anterior, prioridad_nueva, sector_destino_id, sector_origen_id, turno_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-08-21 21:42:02 [http-nio-8080-exec-3] INFO  q.q.services.impl.TurnoServiceImpl - Atención iniciada para turno REN001 por empleado quai
+2025-08-21 21:42:02 [http-nio-8080-exec-3] DEBUG org.hibernate.SQL - 
+    /* update
+        for queue_san_antonio.queues.models.Turno */update turnos 
+    set
+        ciudadano_id=?,
+        codigo=?,
+        empleado_atencion_id=?,
+        estado=?,
+        fecha_actualizacion=?,
+        fecha_cita=?,
+        fecha_hora_atencion=?,
+        fecha_hora_finalizacion=?,
+        fecha_hora_llamado=?,
+        hora_cita=?,
+        motivo_redireccion=?,
+        numero_orden=?,
+        observaciones=?,
+        prioridad=?,
+        sector_id=?,
+        sector_original_id=?,
+        tipo=? 
+    where
+        id=?
+2025-08-21 21:42:02 [http-nio-8080-exec-3] DEBUG org.hibernate.SQL - 
+    select
+        c1_0.id,
+        c1_0.apellido,
+        c1_0.direccion,
+        c1_0.dni,
+        c1_0.es_prioritario,
+        c1_0.fecha_actualizacion,
+        c1_0.fecha_registro,
+        c1_0.motivo_prioridad,
+        c1_0.nombre,
+        c1_0.observaciones,
+        c1_0.telefono 
+    from
+        ciudadanos c1_0 
+    where
+        c1_0.id=?
+2025-08-21 21:42:02 [http-nio-8080-exec-3] DEBUG org.hibernate.SQL - 
+    select
+        s1_0.id,
+        s1_0.activo,
+        s1_0.capacidad_maxima,
+        s1_0.codigo,
+        s1_0.color,
+        s1_0.descripcion,
+        s1_0.fecha_actualizacion,
+        s1_0.fecha_creacion,
+        s1_0.nombre,
+        s1_0.observaciones,
+        s1_0.orden_visualizacion,
+        s1_0.requiere_cita_previa,
+        s1_0.responsable_id,
+        s1_0.tiempo_estimado_atencion,
+        s1_0.tipo_sector 
+    from
+        sectores s1_0 
+    where
+        s1_0.id=?
+2025-08-21 21:42:02 [http-nio-8080-exec-3] INFO  q.q.web.controllers.TurnoController - Atención iniciada para turno: REN001
+2025-08-21 21:43:20 [http-nio-8080-exec-6] DEBUG q.q.security.jwt.JwtRequestFilter - Token JWT procesado para usuario: quai
+2025-08-21 21:43:20 [http-nio-8080-exec-6] DEBUG q.q.s.u.EmpleadoUserDetailsService - Cargando detalles del usuario: quai
+2025-08-21 21:43:20 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        e1_0.id,
+        e1_0.activo,
+        e1_0.apellido,
+        e1_0.dni,
+        e1_0.email,
+        e1_0.fecha_actualizacion,
+        e1_0.fecha_creacion,
+        e1_0.nombre,
+        e1_0.password,
+        e1_0.rol,
+        e1_0.sector_id,
+        e1_0.ultimo_acceso,
+        e1_0.username 
+    from
+        empleados e1_0 
+    where
+        e1_0.username=?
+2025-08-21 21:43:20 [http-nio-8080-exec-6] DEBUG q.q.s.u.EmpleadoUserDetailsService - Usuario encontrado: quai - Rol: ADMIN - Activo: true
+2025-08-21 21:43:20 [http-nio-8080-exec-6] DEBUG q.q.s.u.EmpleadoUserDetailsService - Autoridades asignadas a quai: [ROLE_ADMIN, PERMISSION_ADMIN_ALL, PERMISSION_MANAGE_EMPLOYEES, PERMISSION_MANAGE_SECTORS, PERMISSION_VIEW_STATISTICS, PERMISSION_MANAGE_CONFIGURATION, PERMISSION_MANAGE_MESSAGES, PERMISSION_MANAGE_SCHEDULES, PERMISSION_ATTEND_TURNS, PERMISSION_REDIRECT_TURNS, PERMISSION_VIEW_AUDIT]
+2025-08-21 21:43:20 [http-nio-8080-exec-6] DEBUG q.q.security.jwt.JwtRequestFilter - Autenticación establecida para usuario: quai
+2025-08-21 21:43:20 [http-nio-8080-exec-6] INFO  q.q.web.controllers.TurnoController - Finalizando atención del turno ID: 1
+2025-08-21 21:43:20 [http-nio-8080-exec-6] INFO  q.q.services.impl.TurnoServiceImpl - Finalizando atención del turno 1
+2025-08-21 21:43:20 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.id=?
+2025-08-21 21:43:20 [http-nio-8080-exec-6] DEBUG q.q.services.impl.TurnoServiceImpl - Guardando turno: REN001
+2025-08-21 21:43:20 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    select
+        e1_0.id,
+        e1_0.activo,
+        e1_0.apellido,
+        e1_0.dni,
+        e1_0.email,
+        e1_0.fecha_actualizacion,
+        e1_0.fecha_creacion,
+        e1_0.nombre,
+        e1_0.password,
+        e1_0.rol,
+        e1_0.sector_id,
+        e1_0.ultimo_acceso,
+        e1_0.username 
+    from
+        empleados e1_0 
+    where
+        e1_0.id=?
+2025-08-21 21:43:20 [http-nio-8080-exec-6] DEBUG q.q.s.impl.HistorialTurnoServiceImpl - Registrando finalización del turno: REN001 por empleado: quai
+2025-08-21 21:43:20 [http-nio-8080-exec-6] DEBUG q.q.s.impl.HistorialTurnoServiceImpl - Guardando registro de historial para turno: REN001
+2025-08-21 21:43:20 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    /* insert for
+        queue_san_antonio.queues.models.HistorialTurno */insert 
+    into
+        historial_turnos (accion, empleado_id, estado_anterior, estado_nuevo, fecha_hora, motivo, observaciones, prioridad_anterior, prioridad_nueva, sector_destino_id, sector_origen_id, turno_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-08-21 21:43:20 [http-nio-8080-exec-6] INFO  q.q.services.impl.TurnoServiceImpl - Atención finalizada para turno REN001 - Tiempo espera: 101min, Tiempo atención: nullmin
+2025-08-21 21:43:20 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    /* update
+        for queue_san_antonio.queues.models.Turno */update turnos 
+    set
+        ciudadano_id=?,
+        codigo=?,
+        empleado_atencion_id=?,
+        estado=?,
+        fecha_actualizacion=?,
+        fecha_cita=?,
+        fecha_hora_atencion=?,
+        fecha_hora_finalizacion=?,
+        fecha_hora_llamado=?,
+        hora_cita=?,
+        motivo_redireccion=?,
+        numero_orden=?,
+        observaciones=?,
+        prioridad=?,
+        sector_id=?,
+        sector_original_id=?,
+        tipo=? 
+    where
+        id=?
+2025-08-21 21:43:20 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    select
+        c1_0.id,
+        c1_0.apellido,
+        c1_0.direccion,
+        c1_0.dni,
+        c1_0.es_prioritario,
+        c1_0.fecha_actualizacion,
+        c1_0.fecha_registro,
+        c1_0.motivo_prioridad,
+        c1_0.nombre,
+        c1_0.observaciones,
+        c1_0.telefono 
+    from
+        ciudadanos c1_0 
+    where
+        c1_0.id=?
+2025-08-21 21:43:20 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    select
+        s1_0.id,
+        s1_0.activo,
+        s1_0.capacidad_maxima,
+        s1_0.codigo,
+        s1_0.color,
+        s1_0.descripcion,
+        s1_0.fecha_actualizacion,
+        s1_0.fecha_creacion,
+        s1_0.nombre,
+        s1_0.observaciones,
+        s1_0.orden_visualizacion,
+        s1_0.requiere_cita_previa,
+        s1_0.responsable_id,
+        s1_0.tiempo_estimado_atencion,
+        s1_0.tipo_sector 
+    from
+        sectores s1_0 
+    where
+        s1_0.id=?
+2025-08-21 21:43:20 [http-nio-8080-exec-6] INFO  q.q.web.controllers.TurnoController - Atención finalizada para turno: REN001
+2025-08-21 21:45:19 [http-nio-8080-exec-9] DEBUG q.q.security.jwt.JwtRequestFilter - Token JWT procesado para usuario: quai
+2025-08-21 21:45:19 [http-nio-8080-exec-9] DEBUG q.q.s.u.EmpleadoUserDetailsService - Cargando detalles del usuario: quai
+2025-08-21 21:45:19 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        e1_0.id,
+        e1_0.activo,
+        e1_0.apellido,
+        e1_0.dni,
+        e1_0.email,
+        e1_0.fecha_actualizacion,
+        e1_0.fecha_creacion,
+        e1_0.nombre,
+        e1_0.password,
+        e1_0.rol,
+        e1_0.sector_id,
+        e1_0.ultimo_acceso,
+        e1_0.username 
+    from
+        empleados e1_0 
+    where
+        e1_0.username=?
+2025-08-21 21:45:19 [http-nio-8080-exec-9] DEBUG q.q.s.u.EmpleadoUserDetailsService - Usuario encontrado: quai - Rol: ADMIN - Activo: true
+2025-08-21 21:45:19 [http-nio-8080-exec-9] DEBUG q.q.s.u.EmpleadoUserDetailsService - Autoridades asignadas a quai: [ROLE_ADMIN, PERMISSION_ADMIN_ALL, PERMISSION_MANAGE_EMPLOYEES, PERMISSION_MANAGE_SECTORS, PERMISSION_VIEW_STATISTICS, PERMISSION_MANAGE_CONFIGURATION, PERMISSION_MANAGE_MESSAGES, PERMISSION_MANAGE_SCHEDULES, PERMISSION_ATTEND_TURNS, PERMISSION_REDIRECT_TURNS, PERMISSION_VIEW_AUDIT]
+2025-08-21 21:45:19 [http-nio-8080-exec-9] DEBUG q.q.security.jwt.JwtRequestFilter - Autenticación establecida para usuario: quai
+2025-08-21 21:45:19 [http-nio-8080-exec-9] INFO  q.q.web.controllers.TurnoController - Llamando turno ID: 2
+2025-08-21 21:45:19 [http-nio-8080-exec-9] DEBUG q.q.web.controllers.TurnoController - ID del empleado extraído del JWT: 1
+2025-08-21 21:45:19 [http-nio-8080-exec-9] INFO  q.q.services.impl.TurnoServiceImpl - Empleado 1 llamando turno 2
+2025-08-21 21:45:19 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.id=?
+2025-08-21 21:45:19 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    select
+        e1_0.id,
+        e1_0.activo,
+        e1_0.apellido,
+        e1_0.dni,
+        e1_0.email,
+        e1_0.fecha_actualizacion,
+        e1_0.fecha_creacion,
+        e1_0.nombre,
+        e1_0.password,
+        e1_0.rol,
+        e1_0.sector_id,
+        e1_0.ultimo_acceso,
+        e1_0.username 
+    from
+        empleados e1_0 
+    where
+        e1_0.id=?
+2025-08-21 21:45:19 [http-nio-8080-exec-9] DEBUG q.q.services.impl.TurnoServiceImpl - Guardando turno: CON001
+2025-08-21 21:45:19 [http-nio-8080-exec-9] DEBUG q.q.s.impl.HistorialTurnoServiceImpl - Registrando llamado del turno: CON001 por empleado: quai
+2025-08-21 21:45:19 [http-nio-8080-exec-9] DEBUG q.q.s.impl.HistorialTurnoServiceImpl - Guardando registro de historial para turno: CON001
+2025-08-21 21:45:19 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    /* insert for
+        queue_san_antonio.queues.models.HistorialTurno */insert 
+    into
+        historial_turnos (accion, empleado_id, estado_anterior, estado_nuevo, fecha_hora, motivo, observaciones, prioridad_anterior, prioridad_nueva, sector_destino_id, sector_origen_id, turno_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-08-21 21:45:19 [http-nio-8080-exec-9] INFO  q.q.services.impl.TurnoServiceImpl - Turno CON001 llamado exitosamente por empleado quai
+2025-08-21 21:45:19 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    /* update
+        for queue_san_antonio.queues.models.Turno */update turnos 
+    set
+        ciudadano_id=?,
+        codigo=?,
+        empleado_atencion_id=?,
+        estado=?,
+        fecha_actualizacion=?,
+        fecha_cita=?,
+        fecha_hora_atencion=?,
+        fecha_hora_finalizacion=?,
+        fecha_hora_llamado=?,
+        hora_cita=?,
+        motivo_redireccion=?,
+        numero_orden=?,
+        observaciones=?,
+        prioridad=?,
+        sector_id=?,
+        sector_original_id=?,
+        tipo=? 
+    where
+        id=?
+2025-08-21 21:45:19 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    select
+        c1_0.id,
+        c1_0.apellido,
+        c1_0.direccion,
+        c1_0.dni,
+        c1_0.es_prioritario,
+        c1_0.fecha_actualizacion,
+        c1_0.fecha_registro,
+        c1_0.motivo_prioridad,
+        c1_0.nombre,
+        c1_0.observaciones,
+        c1_0.telefono 
+    from
+        ciudadanos c1_0 
+    where
+        c1_0.id=?
+2025-08-21 21:45:19 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    select
+        s1_0.id,
+        s1_0.activo,
+        s1_0.capacidad_maxima,
+        s1_0.codigo,
+        s1_0.color,
+        s1_0.descripcion,
+        s1_0.fecha_actualizacion,
+        s1_0.fecha_creacion,
+        s1_0.nombre,
+        s1_0.observaciones,
+        s1_0.orden_visualizacion,
+        s1_0.requiere_cita_previa,
+        s1_0.responsable_id,
+        s1_0.tiempo_estimado_atencion,
+        s1_0.tipo_sector 
+    from
+        sectores s1_0 
+    where
+        s1_0.id=?
+2025-08-21 21:45:19 [http-nio-8080-exec-9] INFO  q.q.web.controllers.TurnoController - Turno CON001 llamado exitosamente
+2025-08-21 21:45:58 [http-nio-8080-exec-10] DEBUG q.q.security.jwt.JwtRequestFilter - Token JWT procesado para usuario: quai
+2025-08-21 21:45:58 [http-nio-8080-exec-10] DEBUG q.q.s.u.EmpleadoUserDetailsService - Cargando detalles del usuario: quai
+2025-08-21 21:45:58 [http-nio-8080-exec-10] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        e1_0.id,
+        e1_0.activo,
+        e1_0.apellido,
+        e1_0.dni,
+        e1_0.email,
+        e1_0.fecha_actualizacion,
+        e1_0.fecha_creacion,
+        e1_0.nombre,
+        e1_0.password,
+        e1_0.rol,
+        e1_0.sector_id,
+        e1_0.ultimo_acceso,
+        e1_0.username 
+    from
+        empleados e1_0 
+    where
+        e1_0.username=?
+2025-08-21 21:45:58 [http-nio-8080-exec-10] DEBUG q.q.s.u.EmpleadoUserDetailsService - Usuario encontrado: quai - Rol: ADMIN - Activo: true
+2025-08-21 21:45:58 [http-nio-8080-exec-10] DEBUG q.q.s.u.EmpleadoUserDetailsService - Autoridades asignadas a quai: [ROLE_ADMIN, PERMISSION_ADMIN_ALL, PERMISSION_MANAGE_EMPLOYEES, PERMISSION_MANAGE_SECTORS, PERMISSION_VIEW_STATISTICS, PERMISSION_MANAGE_CONFIGURATION, PERMISSION_MANAGE_MESSAGES, PERMISSION_MANAGE_SCHEDULES, PERMISSION_ATTEND_TURNS, PERMISSION_REDIRECT_TURNS, PERMISSION_VIEW_AUDIT]
+2025-08-21 21:45:58 [http-nio-8080-exec-10] DEBUG q.q.security.jwt.JwtRequestFilter - Autenticación establecida para usuario: quai
+2025-08-21 21:45:58 [http-nio-8080-exec-10] INFO  q.q.web.controllers.TurnoController - Marcando como ausente el turno ID: 2
+2025-08-21 21:45:58 [http-nio-8080-exec-10] DEBUG q.q.web.controllers.TurnoController - ID del empleado extraído del JWT: 1
+2025-08-21 21:45:58 [http-nio-8080-exec-10] INFO  q.q.services.impl.TurnoServiceImpl - Empleado 1 marcando como ausente el turno 2
+2025-08-21 21:45:58 [http-nio-8080-exec-10] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.id=?
+2025-08-21 21:45:58 [http-nio-8080-exec-10] DEBUG org.hibernate.SQL - 
+    select
+        e1_0.id,
+        e1_0.activo,
+        e1_0.apellido,
+        e1_0.dni,
+        e1_0.email,
+        e1_0.fecha_actualizacion,
+        e1_0.fecha_creacion,
+        e1_0.nombre,
+        e1_0.password,
+        e1_0.rol,
+        e1_0.sector_id,
+        e1_0.ultimo_acceso,
+        e1_0.username 
+    from
+        empleados e1_0 
+    where
+        e1_0.id=?
+2025-08-21 21:45:58 [http-nio-8080-exec-10] DEBUG q.q.services.impl.TurnoServiceImpl - Guardando turno: CON001
+2025-08-21 21:45:58 [http-nio-8080-exec-10] DEBUG q.q.s.impl.HistorialTurnoServiceImpl - Registrando ausencia del turno: CON001 por empleado: quai
+2025-08-21 21:45:58 [http-nio-8080-exec-10] DEBUG q.q.s.impl.HistorialTurnoServiceImpl - Guardando registro de historial para turno: CON001
+2025-08-21 21:45:58 [http-nio-8080-exec-10] DEBUG org.hibernate.SQL - 
+    /* insert for
+        queue_san_antonio.queues.models.HistorialTurno */insert 
+    into
+        historial_turnos (accion, empleado_id, estado_anterior, estado_nuevo, fecha_hora, motivo, observaciones, prioridad_anterior, prioridad_nueva, sector_destino_id, sector_origen_id, turno_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-08-21 21:45:58 [http-nio-8080-exec-10] INFO  q.q.s.impl.HistorialTurnoServiceImpl - Ausencia registrada para turno CON001 por empleado quai
+2025-08-21 21:45:58 [http-nio-8080-exec-10] DEBUG q.q.s.i.EstadisticaTurnoServiceImpl - Obteniendo estadística del día 2025-08-21 para sector 3
+2025-08-21 21:45:58 [http-nio-8080-exec-10] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        et1_0.id,
+        et1_0.cantidad_pico,
+        et1_0.empleado_id,
+        et1_0.fecha,
+        et1_0.fecha_actualizacion,
+        et1_0.hora_pico,
+        et1_0.sector_id,
+        et1_0.tiempo_maximo_espera,
+        et1_0.tiempo_minimo_espera,
+        et1_0.tiempo_promedio_atencion,
+        et1_0.tiempo_promedio_espera,
+        et1_0.tiempo_total_atencion,
+        et1_0.turnos_atendidos,
+        et1_0.turnos_ausentes,
+        et1_0.turnos_cancelados,
+        et1_0.turnos_generados,
+        et1_0.turnos_redirigidos 
+    from
+        estadisticas_turnos et1_0 
+    join
+        sectores s1_0 
+            on s1_0.id=et1_0.sector_id 
+    where
+        et1_0.fecha=? 
+        and s1_0.id=? 
+        and et1_0.empleado_id is null
+2025-08-21 21:45:58 [http-nio-8080-exec-10] DEBUG org.hibernate.SQL - 
+    select
+        s1_0.id,
+        s1_0.activo,
+        s1_0.capacidad_maxima,
+        s1_0.codigo,
+        s1_0.color,
+        s1_0.descripcion,
+        s1_0.fecha_actualizacion,
+        s1_0.fecha_creacion,
+        s1_0.nombre,
+        s1_0.observaciones,
+        s1_0.orden_visualizacion,
+        s1_0.requiere_cita_previa,
+        s1_0.responsable_id,
+        s1_0.tiempo_estimado_atencion,
+        s1_0.tipo_sector 
+    from
+        sectores s1_0 
+    where
+        s1_0.id=?
+2025-08-21 21:45:58 [http-nio-8080-exec-10] DEBUG q.q.s.i.EstadisticaTurnoServiceImpl - Guardando estadística para sector: CON - fecha: 2025-08-21 - empleado: General
+2025-08-21 21:45:58 [http-nio-8080-exec-10] DEBUG q.q.s.i.EstadisticaTurnoServiceImpl - Obteniendo estadística del empleado 1 en sector 3 para fecha 2025-08-21
+2025-08-21 21:45:58 [http-nio-8080-exec-10] DEBUG org.hibernate.SQL - 
+    /* update
+        for queue_san_antonio.queues.models.Turno */update turnos 
+    set
+        ciudadano_id=?,
+        codigo=?,
+        empleado_atencion_id=?,
+        estado=?,
+        fecha_actualizacion=?,
+        fecha_cita=?,
+        fecha_hora_atencion=?,
+        fecha_hora_finalizacion=?,
+        fecha_hora_llamado=?,
+        hora_cita=?,
+        motivo_redireccion=?,
+        numero_orden=?,
+        observaciones=?,
+        prioridad=?,
+        sector_id=?,
+        sector_original_id=?,
+        tipo=? 
+    where
+        id=?
+2025-08-21 21:45:58 [http-nio-8080-exec-10] DEBUG org.hibernate.SQL - 
+    /* update
+        for queue_san_antonio.queues.models.EstadisticaTurno */update estadisticas_turnos 
+    set
+        cantidad_pico=?,
+        empleado_id=?,
+        fecha=?,
+        fecha_actualizacion=?,
+        hora_pico=?,
+        sector_id=?,
+        tiempo_maximo_espera=?,
+        tiempo_minimo_espera=?,
+        tiempo_promedio_atencion=?,
+        tiempo_promedio_espera=?,
+        tiempo_total_atencion=?,
+        turnos_atendidos=?,
+        turnos_ausentes=?,
+        turnos_cancelados=?,
+        turnos_generados=?,
+        turnos_redirigidos=? 
+    where
+        id=?
+2025-08-21 21:45:58 [http-nio-8080-exec-10] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        et1_0.id,
+        et1_0.cantidad_pico,
+        et1_0.empleado_id,
+        et1_0.fecha,
+        et1_0.fecha_actualizacion,
+        et1_0.hora_pico,
+        et1_0.sector_id,
+        et1_0.tiempo_maximo_espera,
+        et1_0.tiempo_minimo_espera,
+        et1_0.tiempo_promedio_atencion,
+        et1_0.tiempo_promedio_espera,
+        et1_0.tiempo_total_atencion,
+        et1_0.turnos_atendidos,
+        et1_0.turnos_ausentes,
+        et1_0.turnos_cancelados,
+        et1_0.turnos_generados,
+        et1_0.turnos_redirigidos 
+    from
+        estadisticas_turnos et1_0 
+    join
+        sectores s1_0 
+            on s1_0.id=et1_0.sector_id 
+    left join
+        empleados e1_0 
+            on e1_0.id=et1_0.empleado_id 
+    where
+        et1_0.fecha=? 
+        and s1_0.id=? 
+        and e1_0.id=?
+2025-08-21 21:45:58 [http-nio-8080-exec-10] DEBUG q.q.s.i.EstadisticaTurnoServiceImpl - Guardando estadística para sector: CON - fecha: 2025-08-21 - empleado: quai
+2025-08-21 21:45:58 [http-nio-8080-exec-10] INFO  q.q.services.impl.TurnoServiceImpl - Turno CON001 marcado como ausente por empleado quai
+2025-08-21 21:45:58 [http-nio-8080-exec-10] DEBUG org.hibernate.SQL - 
+    /* update
+        for queue_san_antonio.queues.models.EstadisticaTurno */update estadisticas_turnos 
+    set
+        cantidad_pico=?,
+        empleado_id=?,
+        fecha=?,
+        fecha_actualizacion=?,
+        hora_pico=?,
+        sector_id=?,
+        tiempo_maximo_espera=?,
+        tiempo_minimo_espera=?,
+        tiempo_promedio_atencion=?,
+        tiempo_promedio_espera=?,
+        tiempo_total_atencion=?,
+        turnos_atendidos=?,
+        turnos_ausentes=?,
+        turnos_cancelados=?,
+        turnos_generados=?,
+        turnos_redirigidos=? 
+    where
+        id=?
+2025-08-21 21:45:58 [http-nio-8080-exec-10] DEBUG org.hibernate.SQL - 
+    select
+        c1_0.id,
+        c1_0.apellido,
+        c1_0.direccion,
+        c1_0.dni,
+        c1_0.es_prioritario,
+        c1_0.fecha_actualizacion,
+        c1_0.fecha_registro,
+        c1_0.motivo_prioridad,
+        c1_0.nombre,
+        c1_0.observaciones,
+        c1_0.telefono 
+    from
+        ciudadanos c1_0 
+    where
+        c1_0.id=?
+2025-08-21 21:45:58 [http-nio-8080-exec-10] INFO  q.q.web.controllers.TurnoController - Turno CON001 marcado como ausente
+2025-08-21 21:47:53 [http-nio-8080-exec-3] DEBUG q.q.security.jwt.JwtRequestFilter - Token JWT procesado para usuario: quai
+2025-08-21 21:47:53 [http-nio-8080-exec-3] DEBUG q.q.s.u.EmpleadoUserDetailsService - Cargando detalles del usuario: quai
+2025-08-21 21:47:53 [http-nio-8080-exec-3] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        e1_0.id,
+        e1_0.activo,
+        e1_0.apellido,
+        e1_0.dni,
+        e1_0.email,
+        e1_0.fecha_actualizacion,
+        e1_0.fecha_creacion,
+        e1_0.nombre,
+        e1_0.password,
+        e1_0.rol,
+        e1_0.sector_id,
+        e1_0.ultimo_acceso,
+        e1_0.username 
+    from
+        empleados e1_0 
+    where
+        e1_0.username=?
+2025-08-21 21:47:53 [http-nio-8080-exec-3] DEBUG q.q.s.u.EmpleadoUserDetailsService - Usuario encontrado: quai - Rol: ADMIN - Activo: true
+2025-08-21 21:47:53 [http-nio-8080-exec-3] DEBUG q.q.s.u.EmpleadoUserDetailsService - Autoridades asignadas a quai: [ROLE_ADMIN, PERMISSION_ADMIN_ALL, PERMISSION_MANAGE_EMPLOYEES, PERMISSION_MANAGE_SECTORS, PERMISSION_VIEW_STATISTICS, PERMISSION_MANAGE_CONFIGURATION, PERMISSION_MANAGE_MESSAGES, PERMISSION_MANAGE_SCHEDULES, PERMISSION_ATTEND_TURNS, PERMISSION_REDIRECT_TURNS, PERMISSION_VIEW_AUDIT]
+2025-08-21 21:47:53 [http-nio-8080-exec-3] DEBUG q.q.security.jwt.JwtRequestFilter - Autenticación establecida para usuario: quai
+2025-08-21 21:47:53 [http-nio-8080-exec-3] DEBUG q.q.w.c.HistorialTurnoController - Obteniendo historial del turno ID: 1
+2025-08-21 21:47:53 [http-nio-8080-exec-3] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.id=?
+2025-08-21 21:47:53 [http-nio-8080-exec-3] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        ht1_0.id,
+        ht1_0.accion,
+        ht1_0.empleado_id,
+        ht1_0.estado_anterior,
+        ht1_0.estado_nuevo,
+        ht1_0.fecha_hora,
+        ht1_0.motivo,
+        ht1_0.observaciones,
+        ht1_0.prioridad_anterior,
+        ht1_0.prioridad_nueva,
+        ht1_0.sector_destino_id,
+        ht1_0.sector_origen_id,
+        ht1_0.turno_id 
+    from
+        historial_turnos ht1_0 
+    join
+        turnos t1_0 
+            on t1_0.id=ht1_0.turno_id 
+    where
+        t1_0.id=? 
+    order by
+        ht1_0.fecha_hora
+2025-08-21 21:47:53 [http-nio-8080-exec-3] DEBUG org.hibernate.SQL - 
+    select
+        c1_0.id,
+        c1_0.apellido,
+        c1_0.direccion,
+        c1_0.dni,
+        c1_0.es_prioritario,
+        c1_0.fecha_actualizacion,
+        c1_0.fecha_registro,
+        c1_0.motivo_prioridad,
+        c1_0.nombre,
+        c1_0.observaciones,
+        c1_0.telefono 
+    from
+        ciudadanos c1_0 
+    where
+        c1_0.id=?
+2025-08-21 21:47:53 [http-nio-8080-exec-3] DEBUG org.hibernate.SQL - 
+    select
+        e1_0.id,
+        e1_0.activo,
+        e1_0.apellido,
+        e1_0.dni,
+        e1_0.email,
+        e1_0.fecha_actualizacion,
+        e1_0.fecha_creacion,
+        e1_0.nombre,
+        e1_0.password,
+        e1_0.rol,
+        e1_0.sector_id,
+        e1_0.ultimo_acceso,
+        e1_0.username 
+    from
+        empleados e1_0 
+    where
+        e1_0.id=?
+2025-08-21 21:47:53 [http-nio-8080-exec-3] DEBUG org.hibernate.SQL - 
+    select
+        s1_0.id,
+        s1_0.activo,
+        s1_0.capacidad_maxima,
+        s1_0.codigo,
+        s1_0.color,
+        s1_0.descripcion,
+        s1_0.fecha_actualizacion,
+        s1_0.fecha_creacion,
+        s1_0.nombre,
+        s1_0.observaciones,
+        s1_0.orden_visualizacion,
+        s1_0.requiere_cita_previa,
+        s1_0.responsable_id,
+        s1_0.tiempo_estimado_atencion,
+        s1_0.tipo_sector 
+    from
+        sectores s1_0 
+    where
+        s1_0.id=?
+2025-08-21 21:47:53 [http-nio-8080-exec-3] DEBUG org.hibernate.SQL - 
+    select
+        s1_0.id,
+        s1_0.activo,
+        s1_0.capacidad_maxima,
+        s1_0.codigo,
+        s1_0.color,
+        s1_0.descripcion,
+        s1_0.fecha_actualizacion,
+        s1_0.fecha_creacion,
+        s1_0.nombre,
+        s1_0.observaciones,
+        s1_0.orden_visualizacion,
+        s1_0.requiere_cita_previa,
+        s1_0.responsable_id,
+        s1_0.tiempo_estimado_atencion,
+        s1_0.tipo_sector 
+    from
+        sectores s1_0 
+    where
+        s1_0.id=?
+2025-08-21 21:49:35 [http-nio-8080-exec-6] DEBUG q.q.security.jwt.JwtRequestFilter - Token JWT procesado para usuario: quai
+2025-08-21 21:49:35 [http-nio-8080-exec-6] DEBUG q.q.s.u.EmpleadoUserDetailsService - Cargando detalles del usuario: quai
+2025-08-21 21:49:35 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        e1_0.id,
+        e1_0.activo,
+        e1_0.apellido,
+        e1_0.dni,
+        e1_0.email,
+        e1_0.fecha_actualizacion,
+        e1_0.fecha_creacion,
+        e1_0.nombre,
+        e1_0.password,
+        e1_0.rol,
+        e1_0.sector_id,
+        e1_0.ultimo_acceso,
+        e1_0.username 
+    from
+        empleados e1_0 
+    where
+        e1_0.username=?
+2025-08-21 21:49:35 [http-nio-8080-exec-6] DEBUG q.q.s.u.EmpleadoUserDetailsService - Usuario encontrado: quai - Rol: ADMIN - Activo: true
+2025-08-21 21:49:35 [http-nio-8080-exec-6] DEBUG q.q.s.u.EmpleadoUserDetailsService - Autoridades asignadas a quai: [ROLE_ADMIN, PERMISSION_ADMIN_ALL, PERMISSION_MANAGE_EMPLOYEES, PERMISSION_MANAGE_SECTORS, PERMISSION_VIEW_STATISTICS, PERMISSION_MANAGE_CONFIGURATION, PERMISSION_MANAGE_MESSAGES, PERMISSION_MANAGE_SCHEDULES, PERMISSION_ATTEND_TURNS, PERMISSION_REDIRECT_TURNS, PERMISSION_VIEW_AUDIT]
+2025-08-21 21:49:35 [http-nio-8080-exec-6] DEBUG q.q.security.jwt.JwtRequestFilter - Autenticación establecida para usuario: quai
+2025-08-21 21:49:35 [http-nio-8080-exec-6] DEBUG q.q.w.c.HistorialTurnoController - Obteniendo historial legible del turno ID: 1
+2025-08-21 21:49:35 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.id=?
+2025-08-21 21:49:35 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        ht1_0.id,
+        ht1_0.accion,
+        ht1_0.empleado_id,
+        ht1_0.estado_anterior,
+        ht1_0.estado_nuevo,
+        ht1_0.fecha_hora,
+        ht1_0.motivo,
+        ht1_0.observaciones,
+        ht1_0.prioridad_anterior,
+        ht1_0.prioridad_nueva,
+        ht1_0.sector_destino_id,
+        ht1_0.sector_origen_id,
+        ht1_0.turno_id 
+    from
+        historial_turnos ht1_0 
+    join
+        turnos t1_0 
+            on t1_0.id=ht1_0.turno_id 
+    where
+        t1_0.id=? 
+    order by
+        ht1_0.fecha_hora
+2025-08-21 21:49:35 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    select
+        e1_0.id,
+        e1_0.activo,
+        e1_0.apellido,
+        e1_0.dni,
+        e1_0.email,
+        e1_0.fecha_actualizacion,
+        e1_0.fecha_creacion,
+        e1_0.nombre,
+        e1_0.password,
+        e1_0.rol,
+        e1_0.sector_id,
+        e1_0.ultimo_acceso,
+        e1_0.username 
+    from
+        empleados e1_0 
+    where
+        e1_0.id=?
+2025-08-21 21:49:35 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    select
+        s1_0.id,
+        s1_0.activo,
+        s1_0.capacidad_maxima,
+        s1_0.codigo,
+        s1_0.color,
+        s1_0.descripcion,
+        s1_0.fecha_actualizacion,
+        s1_0.fecha_creacion,
+        s1_0.nombre,
+        s1_0.observaciones,
+        s1_0.orden_visualizacion,
+        s1_0.requiere_cita_previa,
+        s1_0.responsable_id,
+        s1_0.tiempo_estimado_atencion,
+        s1_0.tipo_sector 
+    from
+        sectores s1_0 
+    where
+        s1_0.id=?
+2025-08-21 21:49:35 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    select
+        s1_0.id,
+        s1_0.activo,
+        s1_0.capacidad_maxima,
+        s1_0.codigo,
+        s1_0.color,
+        s1_0.descripcion,
+        s1_0.fecha_actualizacion,
+        s1_0.fecha_creacion,
+        s1_0.nombre,
+        s1_0.observaciones,
+        s1_0.orden_visualizacion,
+        s1_0.requiere_cita_previa,
+        s1_0.responsable_id,
+        s1_0.tiempo_estimado_atencion,
+        s1_0.tipo_sector 
+    from
+        sectores s1_0 
+    where
+        s1_0.id=?
+2025-08-21 21:50:28 [http-nio-8080-exec-7] DEBUG q.q.security.jwt.JwtRequestFilter - Token JWT procesado para usuario: quai
+2025-08-21 21:50:28 [http-nio-8080-exec-7] DEBUG q.q.s.u.EmpleadoUserDetailsService - Cargando detalles del usuario: quai
+2025-08-21 21:50:28 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        e1_0.id,
+        e1_0.activo,
+        e1_0.apellido,
+        e1_0.dni,
+        e1_0.email,
+        e1_0.fecha_actualizacion,
+        e1_0.fecha_creacion,
+        e1_0.nombre,
+        e1_0.password,
+        e1_0.rol,
+        e1_0.sector_id,
+        e1_0.ultimo_acceso,
+        e1_0.username 
+    from
+        empleados e1_0 
+    where
+        e1_0.username=?
+2025-08-21 21:50:28 [http-nio-8080-exec-7] DEBUG q.q.s.u.EmpleadoUserDetailsService - Usuario encontrado: quai - Rol: ADMIN - Activo: true
+2025-08-21 21:50:28 [http-nio-8080-exec-7] DEBUG q.q.s.u.EmpleadoUserDetailsService - Autoridades asignadas a quai: [ROLE_ADMIN, PERMISSION_ADMIN_ALL, PERMISSION_MANAGE_EMPLOYEES, PERMISSION_MANAGE_SECTORS, PERMISSION_VIEW_STATISTICS, PERMISSION_MANAGE_CONFIGURATION, PERMISSION_MANAGE_MESSAGES, PERMISSION_MANAGE_SCHEDULES, PERMISSION_ATTEND_TURNS, PERMISSION_REDIRECT_TURNS, PERMISSION_VIEW_AUDIT]
+2025-08-21 21:50:28 [http-nio-8080-exec-7] DEBUG q.q.security.jwt.JwtRequestFilter - Autenticación establecida para usuario: quai
+2025-08-21 21:50:28 [http-nio-8080-exec-7] DEBUG q.q.w.c.HistorialTurnoController - Obteniendo historial del turno código: REN001
+2025-08-21 21:50:28 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.codigo=?
+2025-08-21 21:50:28 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        ht1_0.id,
+        ht1_0.accion,
+        ht1_0.empleado_id,
+        ht1_0.estado_anterior,
+        ht1_0.estado_nuevo,
+        ht1_0.fecha_hora,
+        ht1_0.motivo,
+        ht1_0.observaciones,
+        ht1_0.prioridad_anterior,
+        ht1_0.prioridad_nueva,
+        ht1_0.sector_destino_id,
+        ht1_0.sector_origen_id,
+        ht1_0.turno_id 
+    from
+        historial_turnos ht1_0 
+    join
+        turnos t1_0 
+            on t1_0.id=ht1_0.turno_id 
+    where
+        t1_0.id=? 
+    order by
+        ht1_0.fecha_hora
+2025-08-21 21:50:28 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - 
+    select
+        c1_0.id,
+        c1_0.apellido,
+        c1_0.direccion,
+        c1_0.dni,
+        c1_0.es_prioritario,
+        c1_0.fecha_actualizacion,
+        c1_0.fecha_registro,
+        c1_0.motivo_prioridad,
+        c1_0.nombre,
+        c1_0.observaciones,
+        c1_0.telefono 
+    from
+        ciudadanos c1_0 
+    where
+        c1_0.id=?
+2025-08-21 21:50:28 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - 
+    select
+        e1_0.id,
+        e1_0.activo,
+        e1_0.apellido,
+        e1_0.dni,
+        e1_0.email,
+        e1_0.fecha_actualizacion,
+        e1_0.fecha_creacion,
+        e1_0.nombre,
+        e1_0.password,
+        e1_0.rol,
+        e1_0.sector_id,
+        e1_0.ultimo_acceso,
+        e1_0.username 
+    from
+        empleados e1_0 
+    where
+        e1_0.id=?
+2025-08-21 21:50:28 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - 
+    select
+        s1_0.id,
+        s1_0.activo,
+        s1_0.capacidad_maxima,
+        s1_0.codigo,
+        s1_0.color,
+        s1_0.descripcion,
+        s1_0.fecha_actualizacion,
+        s1_0.fecha_creacion,
+        s1_0.nombre,
+        s1_0.observaciones,
+        s1_0.orden_visualizacion,
+        s1_0.requiere_cita_previa,
+        s1_0.responsable_id,
+        s1_0.tiempo_estimado_atencion,
+        s1_0.tipo_sector 
+    from
+        sectores s1_0 
+    where
+        s1_0.id=?
+2025-08-21 21:50:28 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - 
+    select
+        s1_0.id,
+        s1_0.activo,
+        s1_0.capacidad_maxima,
+        s1_0.codigo,
+        s1_0.color,
+        s1_0.descripcion,
+        s1_0.fecha_actualizacion,
+        s1_0.fecha_creacion,
+        s1_0.nombre,
+        s1_0.observaciones,
+        s1_0.orden_visualizacion,
+        s1_0.requiere_cita_previa,
+        s1_0.responsable_id,
+        s1_0.tiempo_estimado_atencion,
+        s1_0.tipo_sector 
+    from
+        sectores s1_0 
+    where
+        s1_0.id=?
+2025-08-21 21:51:10 [http-nio-8080-exec-8] DEBUG q.q.security.jwt.JwtRequestFilter - Token JWT procesado para usuario: quai
+2025-08-21 21:51:10 [http-nio-8080-exec-8] DEBUG q.q.s.u.EmpleadoUserDetailsService - Cargando detalles del usuario: quai
+2025-08-21 21:51:10 [http-nio-8080-exec-8] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        e1_0.id,
+        e1_0.activo,
+        e1_0.apellido,
+        e1_0.dni,
+        e1_0.email,
+        e1_0.fecha_actualizacion,
+        e1_0.fecha_creacion,
+        e1_0.nombre,
+        e1_0.password,
+        e1_0.rol,
+        e1_0.sector_id,
+        e1_0.ultimo_acceso,
+        e1_0.username 
+    from
+        empleados e1_0 
+    where
+        e1_0.username=?
+2025-08-21 21:51:10 [http-nio-8080-exec-8] DEBUG q.q.s.u.EmpleadoUserDetailsService - Usuario encontrado: quai - Rol: ADMIN - Activo: true
+2025-08-21 21:51:10 [http-nio-8080-exec-8] DEBUG q.q.s.u.EmpleadoUserDetailsService - Autoridades asignadas a quai: [ROLE_ADMIN, PERMISSION_ADMIN_ALL, PERMISSION_MANAGE_EMPLOYEES, PERMISSION_MANAGE_SECTORS, PERMISSION_VIEW_STATISTICS, PERMISSION_MANAGE_CONFIGURATION, PERMISSION_MANAGE_MESSAGES, PERMISSION_MANAGE_SCHEDULES, PERMISSION_ATTEND_TURNS, PERMISSION_REDIRECT_TURNS, PERMISSION_VIEW_AUDIT]
+2025-08-21 21:51:10 [http-nio-8080-exec-8] DEBUG q.q.security.jwt.JwtRequestFilter - Autenticación establecida para usuario: quai
+2025-08-21 21:51:10 [http-nio-8080-exec-8] DEBUG q.q.w.c.HistorialTurnoController - Obteniendo últimas 50 acciones del sistema
+2025-08-21 21:51:10 [http-nio-8080-exec-8] DEBUG q.q.s.impl.HistorialTurnoServiceImpl - Consultando últimas 50 acciones del sistema
+2025-08-21 21:51:10 [http-nio-8080-exec-8] DEBUG org.hibernate.SQL - 
+    /* SELECT
+        h 
+    FROM
+        HistorialTurno h 
+    ORDER BY
+        h.fechaHora DESC */ select
+            ht1_0.id,
+            ht1_0.accion,
+            ht1_0.empleado_id,
+            ht1_0.estado_anterior,
+            ht1_0.estado_nuevo,
+            ht1_0.fecha_hora,
+            ht1_0.motivo,
+            ht1_0.observaciones,
+            ht1_0.prioridad_anterior,
+            ht1_0.prioridad_nueva,
+            ht1_0.sector_destino_id,
+            ht1_0.sector_origen_id,
+            ht1_0.turno_id 
+        from
+            historial_turnos ht1_0 
+        order by
+            ht1_0.fecha_hora desc 
+        fetch
+            first ? rows only
+2025-08-21 21:51:10 [http-nio-8080-exec-8] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.id=?
+2025-08-21 21:51:10 [http-nio-8080-exec-8] DEBUG org.hibernate.SQL - 
+    select
+        e1_0.id,
+        e1_0.activo,
+        e1_0.apellido,
+        e1_0.dni,
+        e1_0.email,
+        e1_0.fecha_actualizacion,
+        e1_0.fecha_creacion,
+        e1_0.nombre,
+        e1_0.password,
+        e1_0.rol,
+        e1_0.sector_id,
+        e1_0.ultimo_acceso,
+        e1_0.username 
+    from
+        empleados e1_0 
+    where
+        e1_0.id=?
+2025-08-21 21:51:10 [http-nio-8080-exec-8] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.id=?
+2025-08-21 21:51:10 [http-nio-8080-exec-8] DEBUG org.hibernate.SQL - 
+    select
+        s1_0.id,
+        s1_0.activo,
+        s1_0.capacidad_maxima,
+        s1_0.codigo,
+        s1_0.color,
+        s1_0.descripcion,
+        s1_0.fecha_actualizacion,
+        s1_0.fecha_creacion,
+        s1_0.nombre,
+        s1_0.observaciones,
+        s1_0.orden_visualizacion,
+        s1_0.requiere_cita_previa,
+        s1_0.responsable_id,
+        s1_0.tiempo_estimado_atencion,
+        s1_0.tipo_sector 
+    from
+        sectores s1_0 
+    where
+        s1_0.id=?
+2025-08-21 21:51:10 [http-nio-8080-exec-8] DEBUG org.hibernate.SQL - 
+    select
+        s1_0.id,
+        s1_0.activo,
+        s1_0.capacidad_maxima,
+        s1_0.codigo,
+        s1_0.color,
+        s1_0.descripcion,
+        s1_0.fecha_actualizacion,
+        s1_0.fecha_creacion,
+        s1_0.nombre,
+        s1_0.observaciones,
+        s1_0.orden_visualizacion,
+        s1_0.requiere_cita_previa,
+        s1_0.responsable_id,
+        s1_0.tiempo_estimado_atencion,
+        s1_0.tipo_sector 
+    from
+        sectores s1_0 
+    where
+        s1_0.id=?
+2025-08-21 21:51:10 [http-nio-8080-exec-8] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.id=?
+2025-08-21 21:51:10 [http-nio-8080-exec-8] DEBUG org.hibernate.SQL - 
+    select
+        s1_0.id,
+        s1_0.activo,
+        s1_0.capacidad_maxima,
+        s1_0.codigo,
+        s1_0.color,
+        s1_0.descripcion,
+        s1_0.fecha_actualizacion,
+        s1_0.fecha_creacion,
+        s1_0.nombre,
+        s1_0.observaciones,
+        s1_0.orden_visualizacion,
+        s1_0.requiere_cita_previa,
+        s1_0.responsable_id,
+        s1_0.tiempo_estimado_atencion,
+        s1_0.tipo_sector 
+    from
+        sectores s1_0 
+    where
+        s1_0.id=?
+2025-08-21 21:51:10 [http-nio-8080-exec-8] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.id=?
+2025-08-21 21:51:10 [http-nio-8080-exec-8] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.id=?
+2025-08-21 21:51:10 [http-nio-8080-exec-8] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.id=?
+2025-08-21 21:51:10 [http-nio-8080-exec-8] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.id=?
+2025-08-21 21:51:10 [http-nio-8080-exec-8] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.id=?
+2025-08-21 21:51:10 [http-nio-8080-exec-8] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.id=?
+2025-08-21 21:51:10 [http-nio-8080-exec-8] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.id=?
+2025-08-21 21:51:46 [http-nio-8080-exec-9] DEBUG q.q.security.jwt.JwtRequestFilter - Token JWT procesado para usuario: quai
+2025-08-21 21:51:46 [http-nio-8080-exec-9] DEBUG q.q.s.u.EmpleadoUserDetailsService - Cargando detalles del usuario: quai
+2025-08-21 21:51:46 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        e1_0.id,
+        e1_0.activo,
+        e1_0.apellido,
+        e1_0.dni,
+        e1_0.email,
+        e1_0.fecha_actualizacion,
+        e1_0.fecha_creacion,
+        e1_0.nombre,
+        e1_0.password,
+        e1_0.rol,
+        e1_0.sector_id,
+        e1_0.ultimo_acceso,
+        e1_0.username 
+    from
+        empleados e1_0 
+    where
+        e1_0.username=?
+2025-08-21 21:51:46 [http-nio-8080-exec-9] DEBUG q.q.s.u.EmpleadoUserDetailsService - Usuario encontrado: quai - Rol: ADMIN - Activo: true
+2025-08-21 21:51:46 [http-nio-8080-exec-9] DEBUG q.q.s.u.EmpleadoUserDetailsService - Autoridades asignadas a quai: [ROLE_ADMIN, PERMISSION_ADMIN_ALL, PERMISSION_MANAGE_EMPLOYEES, PERMISSION_MANAGE_SECTORS, PERMISSION_VIEW_STATISTICS, PERMISSION_MANAGE_CONFIGURATION, PERMISSION_MANAGE_MESSAGES, PERMISSION_MANAGE_SCHEDULES, PERMISSION_ATTEND_TURNS, PERMISSION_REDIRECT_TURNS, PERMISSION_VIEW_AUDIT]
+2025-08-21 21:51:46 [http-nio-8080-exec-9] DEBUG q.q.security.jwt.JwtRequestFilter - Autenticación establecida para usuario: quai
+2025-08-21 21:51:46 [http-nio-8080-exec-9] DEBUG q.q.w.c.HistorialTurnoController - Obteniendo trazabilidad del ciudadano DNI: 12345678 (límite: 500)
+2025-08-21 21:51:46 [http-nio-8080-exec-9] DEBUG q.q.s.impl.HistorialTurnoServiceImpl - Consultando últimas 1000 acciones del sistema
+2025-08-21 21:51:46 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    /* SELECT
+        h 
+    FROM
+        HistorialTurno h 
+    ORDER BY
+        h.fechaHora DESC */ select
+            ht1_0.id,
+            ht1_0.accion,
+            ht1_0.empleado_id,
+            ht1_0.estado_anterior,
+            ht1_0.estado_nuevo,
+            ht1_0.fecha_hora,
+            ht1_0.motivo,
+            ht1_0.observaciones,
+            ht1_0.prioridad_anterior,
+            ht1_0.prioridad_nueva,
+            ht1_0.sector_destino_id,
+            ht1_0.sector_origen_id,
+            ht1_0.turno_id 
+        from
+            historial_turnos ht1_0 
+        order by
+            ht1_0.fecha_hora desc 
+        fetch
+            first ? rows only
+2025-08-21 21:51:46 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.id=?
+2025-08-21 21:51:46 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    select
+        c1_0.id,
+        c1_0.apellido,
+        c1_0.direccion,
+        c1_0.dni,
+        c1_0.es_prioritario,
+        c1_0.fecha_actualizacion,
+        c1_0.fecha_registro,
+        c1_0.motivo_prioridad,
+        c1_0.nombre,
+        c1_0.observaciones,
+        c1_0.telefono 
+    from
+        ciudadanos c1_0 
+    where
+        c1_0.id=?
+2025-08-21 21:51:46 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.id=?
+2025-08-21 21:51:46 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    select
+        c1_0.id,
+        c1_0.apellido,
+        c1_0.direccion,
+        c1_0.dni,
+        c1_0.es_prioritario,
+        c1_0.fecha_actualizacion,
+        c1_0.fecha_registro,
+        c1_0.motivo_prioridad,
+        c1_0.nombre,
+        c1_0.observaciones,
+        c1_0.telefono 
+    from
+        ciudadanos c1_0 
+    where
+        c1_0.id=?
+2025-08-21 21:51:46 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.id=?
+2025-08-21 21:51:46 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    select
+        c1_0.id,
+        c1_0.apellido,
+        c1_0.direccion,
+        c1_0.dni,
+        c1_0.es_prioritario,
+        c1_0.fecha_actualizacion,
+        c1_0.fecha_registro,
+        c1_0.motivo_prioridad,
+        c1_0.nombre,
+        c1_0.observaciones,
+        c1_0.telefono 
+    from
+        ciudadanos c1_0 
+    where
+        c1_0.id=?
+2025-08-21 21:51:46 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.id=?
+2025-08-21 21:51:46 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    select
+        c1_0.id,
+        c1_0.apellido,
+        c1_0.direccion,
+        c1_0.dni,
+        c1_0.es_prioritario,
+        c1_0.fecha_actualizacion,
+        c1_0.fecha_registro,
+        c1_0.motivo_prioridad,
+        c1_0.nombre,
+        c1_0.observaciones,
+        c1_0.telefono 
+    from
+        ciudadanos c1_0 
+    where
+        c1_0.id=?
+2025-08-21 21:51:46 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.id=?
+2025-08-21 21:51:46 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.id=?
+2025-08-21 21:51:46 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    select
+        c1_0.id,
+        c1_0.apellido,
+        c1_0.direccion,
+        c1_0.dni,
+        c1_0.es_prioritario,
+        c1_0.fecha_actualizacion,
+        c1_0.fecha_registro,
+        c1_0.motivo_prioridad,
+        c1_0.nombre,
+        c1_0.observaciones,
+        c1_0.telefono 
+    from
+        ciudadanos c1_0 
+    where
+        c1_0.id=?
+2025-08-21 21:51:46 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.id=?
+2025-08-21 21:51:46 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.id=?
+2025-08-21 21:51:46 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    select
+        c1_0.id,
+        c1_0.apellido,
+        c1_0.direccion,
+        c1_0.dni,
+        c1_0.es_prioritario,
+        c1_0.fecha_actualizacion,
+        c1_0.fecha_registro,
+        c1_0.motivo_prioridad,
+        c1_0.nombre,
+        c1_0.observaciones,
+        c1_0.telefono 
+    from
+        ciudadanos c1_0 
+    where
+        c1_0.id=?
+2025-08-21 21:51:46 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.id=?
+2025-08-21 21:51:46 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    select
+        c1_0.id,
+        c1_0.apellido,
+        c1_0.direccion,
+        c1_0.dni,
+        c1_0.es_prioritario,
+        c1_0.fecha_actualizacion,
+        c1_0.fecha_registro,
+        c1_0.motivo_prioridad,
+        c1_0.nombre,
+        c1_0.observaciones,
+        c1_0.telefono 
+    from
+        ciudadanos c1_0 
+    where
+        c1_0.id=?
+2025-08-21 21:51:46 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.ciudadano_id,
+        t1_0.codigo,
+        t1_0.empleado_atencion_id,
+        t1_0.estado,
+        t1_0.fecha_actualizacion,
+        t1_0.fecha_cita,
+        t1_0.fecha_hora_atencion,
+        t1_0.fecha_hora_finalizacion,
+        t1_0.fecha_hora_generacion,
+        t1_0.fecha_hora_llamado,
+        t1_0.hora_cita,
+        t1_0.motivo_redireccion,
+        t1_0.numero_orden,
+        t1_0.observaciones,
+        t1_0.prioridad,
+        t1_0.sector_id,
+        t1_0.sector_original_id,
+        t1_0.tipo 
+    from
+        turnos t1_0 
+    where
+        t1_0.id=?
+2025-08-21 21:51:46 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    select
+        c1_0.id,
+        c1_0.apellido,
+        c1_0.direccion,
+        c1_0.dni,
+        c1_0.es_prioritario,
+        c1_0.fecha_actualizacion,
+        c1_0.fecha_registro,
+        c1_0.motivo_prioridad,
+        c1_0.nombre,
+        c1_0.observaciones,
+        c1_0.telefono 
+    from
+        ciudadanos c1_0 
+    where
+        c1_0.id=?
+2025-08-21 21:51:46 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    select
+        e1_0.id,
+        e1_0.activo,
+        e1_0.apellido,
+        e1_0.dni,
+        e1_0.email,
+        e1_0.fecha_actualizacion,
+        e1_0.fecha_creacion,
+        e1_0.nombre,
+        e1_0.password,
+        e1_0.rol,
+        e1_0.sector_id,
+        e1_0.ultimo_acceso,
+        e1_0.username 
+    from
+        empleados e1_0 
+    where
+        e1_0.id=?
+2025-08-21 21:51:46 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    select
+        s1_0.id,
+        s1_0.activo,
+        s1_0.capacidad_maxima,
+        s1_0.codigo,
+        s1_0.color,
+        s1_0.descripcion,
+        s1_0.fecha_actualizacion,
+        s1_0.fecha_creacion,
+        s1_0.nombre,
+        s1_0.observaciones,
+        s1_0.orden_visualizacion,
+        s1_0.requiere_cita_previa,
+        s1_0.responsable_id,
+        s1_0.tiempo_estimado_atencion,
+        s1_0.tipo_sector 
+    from
+        sectores s1_0 
+    where
+        s1_0.id=?
+2025-08-21 21:51:46 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    select
+        s1_0.id,
+        s1_0.activo,
+        s1_0.capacidad_maxima,
+        s1_0.codigo,
+        s1_0.color,
+        s1_0.descripcion,
+        s1_0.fecha_actualizacion,
+        s1_0.fecha_creacion,
+        s1_0.nombre,
+        s1_0.observaciones,
+        s1_0.orden_visualizacion,
+        s1_0.requiere_cita_previa,
+        s1_0.responsable_id,
+        s1_0.tiempo_estimado_atencion,
+        s1_0.tipo_sector 
+    from
+        sectores s1_0 
+    where
+        s1_0.id=?

@@ -514,8 +514,8 @@ public class TurnoServiceImpl implements TurnoService {
     }
 
     private void validarLlamadoTurno(Turno turno, Empleado empleado) {
-        if (turno.getEstado() != EstadoTurno.GENERADO) {
-            throw new IllegalStateException("Solo se pueden llamar turnos en estado GENERADO. Estado actual: " + turno.getEstado());
+        if (turno.getEstado() != EstadoTurno.GENERADO && turno.getEstado() != EstadoTurno.REDIRIGIDO) {
+            throw new IllegalStateException("Solo se pueden llamar turnos en estado GENERADO o REDIRIGIDO. Estado actual: " + turno.getEstado());
         }
 
         if (!empleado.puedeAcceder()) {
