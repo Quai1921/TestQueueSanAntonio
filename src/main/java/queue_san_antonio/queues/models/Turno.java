@@ -3,6 +3,7 @@ package queue_san_antonio.queues.models;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import jakarta.persistence.UniqueConstraint;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -15,7 +16,13 @@ import java.util.List;
 
 
 @Entity
-@Table(name = "turnos")
+@Table(name = "turnos",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_turno_codigo_fecha",
+                        columnNames = {"codigo", "fecha_hora_generacion"}
+                )
+        })
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,7 +35,8 @@ public class Turno {
     @EqualsAndHashCode.Include
     private Long id;
 
-    @Column(name = "codigo", unique = true, nullable = false, length = 20)
+    @Column(name = "codigo", nullable = false, length = 20)
+//    unique = true,
     @NotBlank(message = "El código del turno es obligatorio")
     @EqualsAndHashCode.Include
     private String codigo; // A001, B042, etc.

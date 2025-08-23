@@ -18,8 +18,13 @@ import java.util.Optional;
 @Repository
 public interface TurnoRepository extends JpaRepository<Turno, Long> {
 
-    // Buscar por código
-    Optional<Turno> findByCodigo(String codigo);
+    // Buscar por código - el más reciente si hay duplicados
+    @Query(value = "SELECT * FROM turnos WHERE codigo = :codigo ORDER BY fecha_hora_generacion DESC LIMIT 1", nativeQuery = true)
+    Optional<Turno> findByCodigo(@Param("codigo") String codigo);
+
+    // Método adicional para buscar por código y fecha específica
+    @Query("SELECT t FROM Turno t WHERE t.codigo = :codigo AND DATE(t.fechaHoraGeneracion) = :fecha")
+    Optional<Turno> findByCodigoAndFecha(@Param("codigo") String codigo, @Param("fecha") LocalDate fecha);
 
     // Turnos activos de un sector (cola de espera) - INCLUIR REDIRIGIDO
     @Query("SELECT t FROM Turno t WHERE t.sector.id = :sectorId AND t.estado IN ('GENERADO', 'LLAMADO', 'EN_ATENCION', 'REDIRIGIDO') ORDER BY t.prioridad DESC, t.fechaHoraGeneracion ASC")

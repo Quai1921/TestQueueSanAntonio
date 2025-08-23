@@ -60,7 +60,16 @@ public class TurnoServiceImpl implements TurnoService {
         if (codigo == null || codigo.trim().isEmpty()) {
             return Optional.empty();
         }
+        // Busca el más reciente si hay duplicados
         return turnoRepository.findByCodigo(codigo.trim().toUpperCase());
+    }
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Turno> buscarPorCodigoYFecha(String codigo, LocalDate fecha) {
+        if (codigo == null || codigo.trim().isEmpty() || fecha == null) {
+            return Optional.empty();
+        }
+        return turnoRepository.findByCodigoAndFecha(codigo.trim().toUpperCase(), fecha);
     }
 
     @Override

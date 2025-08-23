@@ -72,9 +72,35 @@ public class TurnoController {
         TurnoResponse response = TurnoMapper.toResponse(turno);
 
         return ResponseEntity.ok(
-                ApiResponseWrapper.success(response, "Turno encontrado")
+                ApiResponseWrapper.success(response,
+                        String.format("Turno %s encontrado (último generado)", codigo))
         );
     }
+
+    //Consulta pública de turno por código y fecha específica
+    //GET /api/turnos/codigo/{codigo}/fecha/{fecha}
+    @GetMapping("/codigo/{codigo}/fecha/{fecha}")
+    public ResponseEntity<ApiResponseWrapper<TurnoResponse>> consultarTurnoPorCodigoYFecha(
+            @PathVariable
+            @Pattern(regexp = "^[A-Z]{2,10}[0-9]{3}$", message = "Código de turno inválido")
+            String codigo,
+            @PathVariable
+            @DateTimeFormat(pattern = "yyyy-MM-dd")
+            LocalDate fecha) {
+
+        log.debug("Consulta pública de turno por código: {} y fecha: {}", codigo, fecha);
+
+        Turno turno = turnoService.buscarPorCodigoYFecha(codigo, fecha)
+                .orElseThrow(() -> ResourceNotFoundException.turno(codigo + " en fecha " + fecha));
+
+        TurnoResponse response = TurnoMapper.toResponse(turno);
+
+        return ResponseEntity.ok(
+                ApiResponseWrapper.success(response,
+                        String.format("Turno %s encontrado para la fecha %s", codigo, fecha))
+        );
+    }
+
 
     // ==========================================
     // ENDPOINTS DE GENERACIÓN (EMPLEADOS)

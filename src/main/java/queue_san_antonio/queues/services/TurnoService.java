@@ -14,6 +14,7 @@ public interface TurnoService {
     Turno guardar(Turno turno);
     Optional<Turno> buscarPorId(Long id);
     Optional<Turno> buscarPorCodigo(String codigo);
+    Optional<Turno> buscarPorCodigoYFecha(String codigo, LocalDate fecha);
 
     // Generación de turnos
     Turno generarTurno(Long ciudadanoId, Long sectorId, TipoTurno tipo, Long empleadoId);
