@@ -89,7 +89,7 @@ public class Empleado {
     @Builder.Default
     private List<Turno> turnosAtendidos = new ArrayList<>();
 
-    // Métodos helper
+        // Métodos helper
 
     /**
      * Verifica si el empleado está activo
@@ -210,6 +210,14 @@ public class Empleado {
      */
     public int getCantidadTurnosAtendidos() {
         return turnosAtendidos != null ? turnosAtendidos.size() : 0;
+    }
+
+    /**
+     * Obtiene la lista de sectores donde es responsable
+     * @return lista de sectores responsables
+     */
+    public List<Sector> getSectoresResponsable() {
+        return sectoresResponsable != null ? sectoresResponsable : new ArrayList<>();
     }
 
     @Override

@@ -95,6 +95,7 @@ public class EmpleadoMapper {
                 .ultimoAcceso(empleado.getUltimoAcceso())
                 .sectorCodigo(empleado.getSector() != null ? empleado.getSector().getCodigo() : null)
                 .sectorNombre(empleado.getSector() != null ? empleado.getSector().getNombre() : null)
+                .sectoresResponsable(toSectoresResponsable(empleado))
                 .cantidadTurnosAtendidos(empleado.getCantidadTurnosAtendidos())
                 .puedeAcceder(empleado.puedeAcceder())
                 .build();
@@ -129,5 +130,21 @@ public class EmpleadoMapper {
                 .nombreCompleto(empleado.getSector().getNombreCompleto())
                 .activo(empleado.getSector().getActivo())
                 .build();
+    }
+
+    private static List<EmpleadoSummaryResponse.SectorInfo> toSectoresResponsable(Empleado empleado) {
+        if (empleado == null || !empleado.esResponsable()) {
+            return List.of();
+        }
+
+        // Buscar sectores donde este empleado es responsable
+        // Esto requiere una consulta al repositorio de sectores
+        return empleado.getSectoresResponsable().stream()
+                .map(sector -> EmpleadoSummaryResponse.SectorInfo.builder()
+                        .id(sector.getId())
+                        .codigo(sector.getCodigo())
+                        .nombre(sector.getNombre())
+                        .build())
+                .toList();
     }
 }

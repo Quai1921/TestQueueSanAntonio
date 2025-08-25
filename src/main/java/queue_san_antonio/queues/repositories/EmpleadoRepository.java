@@ -1,6 +1,7 @@
 package queue_san_antonio.queues.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import queue_san_antonio.queues.models.Empleado;
 import queue_san_antonio.queues.models.RolEmpleado;
@@ -27,4 +28,7 @@ public interface EmpleadoRepository extends JpaRepository<Empleado, Long> {
 
     // Verificar si email ya existe
     boolean existsByEmail(String email);
+
+    @Query("SELECT e FROM Empleado e " + "LEFT JOIN FETCH e.sector " + "LEFT JOIN FETCH e.sectoresResponsable " + "WHERE e.activo = true")
+    List<Empleado> findAllActivosConSectores();
 }
