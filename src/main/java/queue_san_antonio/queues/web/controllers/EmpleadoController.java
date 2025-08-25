@@ -18,6 +18,7 @@ import queue_san_antonio.queues.web.dto.mapper.EmpleadoMapper;
 import queue_san_antonio.queues.web.exceptions.custom.ResourceNotFoundException;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 //Controlador REST para la gestión de empleados
 //Solo accesible para administradores
@@ -239,6 +240,9 @@ public class EmpleadoController {
         Empleado empleado = empleadoService.buscarPorId(id)
                 .orElseThrow(() -> ResourceNotFoundException.empleado(id));
 
+        // GUARDAR EL ROL ANTERIOR ANTES DE ACTUALIZAR
+        RolEmpleado rolAnterior = empleado.getRol();
+
         // Verificar DNI único si cambió
         if (request.getDni() != null &&
                 !request.getDni().equals(empleado.getDni()) &&
@@ -256,6 +260,13 @@ public class EmpleadoController {
             empleado.setEmail(request.getEmailLimpio());
             empleado.setDni(request.getDniLimpio());
             empleado.setRol(request.getRol());
+
+            // MANEJAR CAMBIO DE ROL SI ES NECESARIO
+            if (rolAnterior != request.getRol()) {
+                log.info("Cambio de rol detectado para empleado {}: {} -> {}",
+                        empleado.getUsername(), rolAnterior, request.getRol());
+                manejarCambioDeRol(empleado, rolAnterior, request.getRol());
+            }
 
             // Manejar sector
             if (request.getSectorId() != null) {
@@ -445,6 +456,57 @@ public class EmpleadoController {
         return ResponseEntity.ok(
                 ApiResponseWrapper.success(estadisticas, "Estadísticas de empleados obtenidas")
         );
+    }
+
+    private void manejarCambioDeRol(Empleado empleado, RolEmpleado rolAnterior, RolEmpleado nuevoRol) {
+        switch (nuevoRol) {
+            case ADMIN -> {
+                // Admin no necesita sector, desasignar cualquier sector
+                if (empleado.getSector() != null) {
+                    log.info("Desasignando sector al empleado {} que pasa a ADMIN", empleado.getUsername());
+                    empleado.asignarASector(null);
+                }
+                // Si era responsable, remover de sectores
+                if (rolAnterior == RolEmpleado.RESPONSABLE_SECTOR) {
+                    removerDeResponsabilidades(empleado);
+                }
+            }
+            case RESPONSABLE_SECTOR -> {
+                // Si era operador, desasignar sector actual
+                if (rolAnterior == RolEmpleado.OPERADOR && empleado.getSector() != null) {
+                    log.info("Desasignando sector al empleado {} que pasa de OPERADOR a RESPONSABLE_SECTOR",
+                            empleado.getUsername());
+                    empleado.asignarASector(null);
+                }
+            }
+            case OPERADOR -> {
+                // Si era responsable, remover de sectores donde es responsable
+                if (rolAnterior == RolEmpleado.RESPONSABLE_SECTOR) {
+                    removerDeResponsabilidades(empleado);
+                    // También desasignar sector actual
+                    empleado.asignarASector(null);
+                }
+            }
+        }
+    }
+
+    // AGREGAR ESTE MÉTODO PRIVADO AL CONTROLLER
+    private void removerDeResponsabilidades(Empleado empleado) {
+        log.info("Removiendo responsabilidades del empleado {} en sectores", empleado.getUsername());
+
+        // Buscar sectores donde es responsable
+        List<Sector> sectoresResponsable = sectorService.listarTodos()
+                .stream()
+                .filter(s -> s.getResponsable() != null &&
+                        s.getResponsable().getId().equals(empleado.getId()))
+                .collect(Collectors.toList());
+
+        for (Sector sector : sectoresResponsable) {
+            log.info("Removiendo a {} como responsable del sector {}",
+                    empleado.getUsername(), sector.getCodigo());
+            sector.establecerResponsable(null);
+            sectorService.guardar(sector);
+        }
     }
 
     // ==========================================

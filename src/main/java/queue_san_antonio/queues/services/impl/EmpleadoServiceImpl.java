@@ -218,9 +218,38 @@ public class EmpleadoServiceImpl implements EmpleadoService {
         }
 
         return empleadoGuardado;
-
-
     }
+
+    @Override
+    @Transactional
+    public Empleado actualizarEmpleado(Long empleadoId, String nombre, String apellido,
+                                       String email, String dni, RolEmpleado nuevoRol, Long sectorId) {
+
+        Empleado empleado = buscarPorId(empleadoId)
+                .orElseThrow(() -> new IllegalArgumentException("Empleado no encontrado"));
+
+        RolEmpleado rolAnterior = empleado.getRol();
+
+        // Actualizar datos básicos
+        empleado.setNombre(nombre);
+        empleado.setApellido(apellido);
+        empleado.setEmail(email);
+        empleado.setDni(dni);
+        empleado.setRol(nuevoRol);
+
+        // LÓGICA PARA CAMBIO DE ROL
+        if (rolAnterior != nuevoRol) {
+            manejarCambioDeRol(empleado, rolAnterior, nuevoRol);
+        }
+
+        // Asignar sector si se especifica
+        if (sectorId != null) {
+            asignarASector(empleado.getId(), sectorId);
+        }
+
+        return guardar(empleado);
+    }
+
 
     @Override
     public void cambiarPassword(Long empleadoId, String nuevaPassword) {
@@ -387,4 +416,41 @@ public class EmpleadoServiceImpl implements EmpleadoService {
             }
         }
     }
+
+    private void manejarCambioDeRol(Empleado empleado, RolEmpleado rolAnterior, RolEmpleado nuevoRol) {
+        switch (nuevoRol) {
+            case ADMIN -> {
+                // Admin no necesita sector, desasignar cualquier sector
+                if (empleado.getSector() != null) {
+                    log.info("Desasignando sector al empleado {} que pasa a ADMIN", empleado.getUsername());
+                    empleado.asignarASector(null);
+                }
+            }
+            case RESPONSABLE_SECTOR -> {
+                // Si era operador, desasignar sector actual para posterior reasignación como responsable
+                if (rolAnterior == RolEmpleado.OPERADOR && empleado.getSector() != null) {
+                    log.info("Desasignando sector al empleado {} que pasa de OPERADOR a RESPONSABLE_SECTOR",
+                            empleado.getUsername());
+                    empleado.asignarASector(null);
+                }
+            }
+            case OPERADOR -> {
+                // Si era responsable, remover de sectores donde es responsable
+                if (rolAnterior == RolEmpleado.RESPONSABLE_SECTOR) {
+                    log.info("Removiendo responsabilidad de sectores al empleado {} que pasa a OPERADOR",
+                            empleado.getUsername());
+                    // Buscar sectores donde es responsable y desasignarlo
+                    List<Sector> sectoresResponsable = sectorRepository.findByResponsableId(empleado.getId());
+                    for (Sector sector : sectoresResponsable) {
+                        sector.establecerResponsable(null);
+                        sectorRepository.save(sector);
+                    }
+                    // También desasignar de sector actual para posterior reasignación
+                    empleado.asignarASector(null);
+                }
+            }
+        }
+
+    }
+
 }

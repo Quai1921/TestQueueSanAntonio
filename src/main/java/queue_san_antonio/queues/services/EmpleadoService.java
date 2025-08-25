@@ -27,6 +27,7 @@ public interface EmpleadoService {
 
     // Operaciones de negocio
     Empleado crear(String username, String password, String nombre, String apellido, String email, String dni, RolEmpleado rol, Long sectorId);
+    Empleado actualizarEmpleado(Long empleadoId, String nombre, String apellido, String email, String dni, RolEmpleado nuevoRol, Long sectorId);
     void cambiarPassword(Long empleadoId, String nuevaPassword);
     void asignarASector(Long empleadoId, Long sectorId);
     void activar(Long empleadoId);

@@ -2,6 +2,7 @@ package queue_san_antonio.queues.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import queue_san_antonio.queues.models.Sector;
 
@@ -27,4 +28,7 @@ public interface SectorRepository extends JpaRepository<Sector, Long> {
 
     @Query("SELECT DISTINCT s FROM Sector s LEFT JOIN FETCH s.empleados e WHERE e.activo = true OR e IS NULL ORDER BY s.ordenVisualizacion ASC, s.nombre ASC")
     List<Sector> findAllWithEmpleados();
+
+    @Query("SELECT s FROM Sector s WHERE s.responsable.id = :empleadoId")
+    List<Sector> findByResponsableId(@Param("empleadoId") Long empleadoId);
 }
