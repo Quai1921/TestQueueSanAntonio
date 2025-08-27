@@ -204,9 +204,24 @@ public class SectorServiceImpl implements SectorService {
                     "El empleado " + empleado.getUsername() + " tiene rol: " + empleado.getRol());
         }
 
+        if (sector.getResponsable() != null) {
+            Empleado responsableAnterior = sector.getResponsable();
+            log.info("Desasignando responsable anterior {} del sector {}",
+                    responsableAnterior.getUsername(), sector.getCodigo());
+
+            // Desasignar el empleado anterior del sector
+            responsableAnterior.asignarASector(null);
+            empleadoRepository.save(responsableAnterior);
+
+            log.debug("Responsable anterior {} desasignado exitosamente", responsableAnterior.getUsername());
+        }
+
         // Asignar responsable
         sector.establecerResponsable(empleado);
         guardar(sector);
+
+        empleado.asignarASector(sector);
+        empleadoRepository.save(empleado);
 
         log.info("Se asignó exitosamente a {} como responsable del sector {}",
                 empleado.getUsername(), sector.getCodigo());

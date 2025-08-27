@@ -211,12 +211,32 @@ public class EmpleadoServiceImpl implements EmpleadoService {
         Empleado empleadoGuardado = guardar(nuevoEmpleado);
 
         // Si es responsable de sector y tiene sector asignado, asignarlo como responsable automáticamente
+//        if (rol == RolEmpleado.RESPONSABLE_SECTOR && sector != null) {
+//            log.info("Asignando automáticamente como responsable del sector {}", sector.getCodigo());
+//            sector.establecerResponsable(empleadoGuardado);
+//            sectorRepository.save(sector);
+//        }
         if (rol == RolEmpleado.RESPONSABLE_SECTOR && sector != null) {
             log.info("Asignando automáticamente como responsable del sector {}", sector.getCodigo());
+
+            // **NUEVA LÓGICA: Desasignar responsable anterior si existe**
+            if (sector.getResponsable() != null) {
+                Empleado responsableAnterior = sector.getResponsable();
+                log.info("Desasignando responsable anterior {} del sector {}",
+                        responsableAnterior.getUsername(), sector.getCodigo());
+
+                // Desasignar el empleado anterior del sector
+                responsableAnterior.asignarASector(null);
+                empleadoRepository.save(responsableAnterior);
+
+                log.debug("Responsable anterior {} desasignado exitosamente", responsableAnterior.getUsername());
+            }
+
+            // Asignar el nuevo responsable
             sector.establecerResponsable(empleadoGuardado);
             sectorRepository.save(sector);
         }
-
+        
         return empleadoGuardado;
     }
 
