@@ -35,4 +35,24 @@ public interface EmpleadoService {
 
     //Lista todos los empleados (para administradores)
     List<Empleado> listarTodos();
+
+
+
+
+
+    //Busca el responsable asignado a un sector específico
+    Optional<Empleado> buscarResponsablePorSector(Long sectorId);
+
+    //Busca todos los operadores asignados a un sector específico
+    List<Empleado> buscarOperadoresPorSector(Long sectorId);
+
+    //Busca operadores que no están asignados a ningún sector
+    List<Empleado> buscarOperadoresSinSector();
+
+    //Busca empleados por rol específico
+    List<Empleado> buscarPorRol(RolEmpleado rol);
+
+
+
+
 }

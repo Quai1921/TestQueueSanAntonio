@@ -3,6 +3,7 @@ package queue_san_antonio.queues.web.controllers;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -15,9 +16,13 @@ import queue_san_antonio.queues.services.SectorService;
 import queue_san_antonio.queues.web.dto.common.ApiResponseWrapper;
 import queue_san_antonio.queues.web.dto.empleado.*;
 import queue_san_antonio.queues.web.dto.mapper.EmpleadoMapper;
+import queue_san_antonio.queues.web.dto.mapper.SectorMapper;
 import queue_san_antonio.queues.web.exceptions.custom.ResourceNotFoundException;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 //Controlador REST para la gestión de empleados
@@ -457,6 +462,128 @@ public class EmpleadoController {
                 ApiResponseWrapper.success(estadisticas, "Estadísticas de empleados obtenidas")
         );
     }
+
+
+
+
+
+
+
+
+
+    /**
+     * Obtiene el personal asignado a un sector específico
+     * GET /api/empleados/por-sector/{sectorId}
+     */
+    @GetMapping("/por-sector/{sectorId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponseWrapper<Map<String, Object>>> obtenerPersonalPorSector(
+            @PathVariable Long sectorId) {
+
+        log.debug("Obteniendo personal del sector ID: {}", sectorId);
+
+        try {
+            // Verificar que el sector existe
+            Sector sector = sectorService.buscarPorId(sectorId)
+                    .orElseThrow(() -> ResourceNotFoundException.sector(sectorId));
+
+            // Buscar responsable del sector
+            Optional<Empleado> responsable = empleadoService.buscarResponsablePorSector(sectorId);
+
+            // Buscar operadores del sector
+            List<Empleado> operadores = empleadoService.buscarOperadoresPorSector(sectorId);
+
+            // Construir respuesta
+            Map<String, Object> personal = new HashMap<>();
+            personal.put("responsable", responsable.map(EmpleadoMapper::toResponse).orElse(null));
+            personal.put("operadores", EmpleadoMapper.toResponseList(operadores));
+            personal.put("sector", SectorMapper.toResponse(sector));
+
+            return ResponseEntity.ok(
+                    ApiResponseWrapper.success(personal,
+                            String.format("Personal del sector %s obtenido exitosamente", sector.getCodigo()))
+            );
+
+        } catch (Exception e) {
+            log.error("Error obteniendo personal del sector {}: {}", sectorId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponseWrapper.error("Error interno obteniendo personal del sector"));
+        }
+    }
+
+    /**
+     * Obtiene operadores disponibles (sin sector asignado)
+     * GET /api/empleados/operadores-disponibles
+     */
+    @GetMapping("/operadores-disponibles")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponseWrapper<List<EmpleadoResponse>>> obtenerOperadoresDisponibles() {
+
+        log.debug("Obteniendo operadores disponibles (sin sector asignado)");
+
+        try {
+            List<Empleado> operadores = empleadoService.buscarOperadoresSinSector();
+            List<EmpleadoResponse> response = EmpleadoMapper.toResponseList(operadores);
+
+            return ResponseEntity.ok(
+                    ApiResponseWrapper.success(response,
+                            String.format("Se encontraron %d operadores disponibles", operadores.size()))
+            );
+
+        } catch (Exception e) {
+            log.error("Error obteniendo operadores disponibles: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponseWrapper.error("Error interno obteniendo operadores disponibles"));
+        }
+    }
+
+    /**
+     * Obtiene empleados por rol específico
+     * GET /api/empleados/por-rol/{rol}
+     */
+    @GetMapping("/por-rol/{rol}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponseWrapper<List<EmpleadoResponse>>> obtenerEmpleadosPorRol(
+            @PathVariable String rol) {
+
+        log.debug("Obteniendo empleados con rol: {}", rol);
+
+        try {
+            // Validar que el rol existe
+            RolEmpleado rolEnum;
+            try {
+                rolEnum = RolEmpleado.valueOf(rol.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.badRequest()
+                        .body(ApiResponseWrapper.error("Rol inválido: " + rol));
+            }
+
+            List<Empleado> empleados = empleadoService.buscarPorRol(rolEnum);
+            List<EmpleadoResponse> response = EmpleadoMapper.toResponseList(empleados);
+
+            return ResponseEntity.ok(
+                    ApiResponseWrapper.success(response,
+                            String.format("Se encontraron %d empleados con rol %s",
+                                    empleados.size(), rol))
+            );
+
+        } catch (Exception e) {
+            log.error("Error obteniendo empleados por rol {}: {}", rol, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponseWrapper.error("Error interno obteniendo empleados por rol"));
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
 
     private void manejarCambioDeRol(Empleado empleado, RolEmpleado rolAnterior, RolEmpleado nuevoRol) {
         switch (nuevoRol) {

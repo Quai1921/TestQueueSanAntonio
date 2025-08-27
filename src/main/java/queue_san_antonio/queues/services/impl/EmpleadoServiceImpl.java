@@ -236,7 +236,7 @@ public class EmpleadoServiceImpl implements EmpleadoService {
             sector.establecerResponsable(empleadoGuardado);
             sectorRepository.save(sector);
         }
-        
+
         return empleadoGuardado;
     }
 
@@ -378,6 +378,63 @@ public class EmpleadoServiceImpl implements EmpleadoService {
     public List<Empleado> listarTodos() {
         return empleadoRepository.findAll();
     }
+
+
+
+
+
+
+
+
+
+    @Override
+    public Optional<Empleado> buscarResponsablePorSector(Long sectorId) {
+        log.debug("Buscando responsable del sector ID: {}", sectorId);
+
+        return empleadoRepository.findBySectorIdAndRol(sectorId, RolEmpleado.RESPONSABLE_SECTOR)
+                .stream()
+                .findFirst();
+    }
+
+    @Override
+    public List<Empleado> buscarOperadoresPorSector(Long sectorId) {
+        log.debug("Buscando operadores del sector ID: {}", sectorId);
+
+        return empleadoRepository.findBySectorIdAndRolAndActivoTrue(sectorId, RolEmpleado.OPERADOR);
+    }
+
+    @Override
+    public List<Empleado> buscarOperadoresSinSector() {
+        log.debug("Buscando operadores sin sector asignado");
+
+        return empleadoRepository.findByRolAndSectorIsNullAndActivoTrue(RolEmpleado.OPERADOR);
+    }
+
+    @Override
+    public List<Empleado> buscarPorRol(RolEmpleado rol) {
+        log.debug("Buscando empleados con rol: {}", rol);
+
+        return empleadoRepository.findByRolAndActivoTrue(rol);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

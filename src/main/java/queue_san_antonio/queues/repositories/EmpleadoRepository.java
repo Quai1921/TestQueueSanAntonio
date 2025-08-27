@@ -31,4 +31,20 @@ public interface EmpleadoRepository extends JpaRepository<Empleado, Long> {
 
     @Query("SELECT e FROM Empleado e " + "LEFT JOIN FETCH e.sector " + "LEFT JOIN FETCH e.sectoresResponsable " + "WHERE e.activo = true")
     List<Empleado> findAllActivosConSectores();
+
+
+
+
+    //Busca empleados por sector y rol
+    List<Empleado> findBySectorIdAndRol(Long sectorId, RolEmpleado rol);
+
+    //Busca empleados activos por sector y rol
+    List<Empleado> findBySectorIdAndRolAndActivoTrue(Long sectorId, RolEmpleado rol);
+
+    //Busca empleados activos por rol sin sector asignado
+    List<Empleado> findByRolAndSectorIsNullAndActivoTrue(RolEmpleado rol);
+
+
+
+
 }
