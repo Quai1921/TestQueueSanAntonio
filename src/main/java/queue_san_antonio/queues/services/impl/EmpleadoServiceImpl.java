@@ -409,10 +409,15 @@ public class EmpleadoServiceImpl implements EmpleadoService {
             }
             case OPERADOR -> {
                 // Los operadores DEBEN tener un sector asignado
-                if (sector == null) {
-                    throw new IllegalArgumentException("Los operadores deben tener un sector asignado");
+//                if (sector == null) {
+//                    throw new IllegalArgumentException("Los operadores deben tener un sector asignado");
+//                }
+//                log.debug("Asignando operador al sector {}", sector.getCodigo());
+                if (sector != null) {
+                    log.debug("Asignando operador al sector {}", sector.getCodigo());
+                } else {
+                    log.debug("Desasignando operador - quedará disponible para reasignación");
                 }
-                log.debug("Asignando operador al sector {}", sector.getCodigo());
             }
         }
     }
