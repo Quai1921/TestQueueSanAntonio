@@ -1,6 +1,7 @@
 package queue_san_antonio.queues.web.dto.mapper;
 
 import queue_san_antonio.queues.models.Sector;
+import queue_san_antonio.queues.models.TipoSector;
 import queue_san_antonio.queues.web.dto.sector.SectorRequest;
 import queue_san_antonio.queues.web.dto.sector.SectorResponse;
 import queue_san_antonio.queues.web.dto.sector.SectorUpdateRequest;
@@ -41,6 +42,16 @@ public class SectorMapper {
         }
         if (request.getTipoSector() != null) {
             sector.setTipoSector(request.getTipoSector());
+
+            // Automáticamente sincronizar requiereCitaPrevia
+            if (request.getTipoSector() == TipoSector.ESPECIAL) {
+                sector.setRequiereCitaPrevia(true);
+            } else if (request.getTipoSector() == TipoSector.NORMAL) {
+                // Solo cambiar a false si no se especifica explícitamente en la request
+                if (request.getRequiereCitaPrevia() == null) {
+                    sector.setRequiereCitaPrevia(false);
+                }
+            }
         }
         if (request.getRequiereCitaPrevia() != null) {
             sector.setRequiereCitaPrevia(request.getRequiereCitaPrevia());

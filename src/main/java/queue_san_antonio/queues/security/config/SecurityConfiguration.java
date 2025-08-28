@@ -62,9 +62,9 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/turnos/consulta/**").permitAll()
 
                         // Endpoints de desarrollo y monitoreo
-                        .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers("/actuator/**").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+//                        .requestMatchers("/h2-console/**").permitAll()
+//                        .requestMatchers("/actuator/**").permitAll()
+//                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
                         // Endpoints administrativos - Solo ADMIN
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")

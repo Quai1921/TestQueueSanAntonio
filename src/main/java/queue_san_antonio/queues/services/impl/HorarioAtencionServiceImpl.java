@@ -60,7 +60,8 @@ public class HorarioAtencionServiceImpl implements HorarioAtencionService {
         if (sectorId == null) {
             return List.of();
         }
-        return horarioAtencionRepository.findBySectorIdAndActivoTrueOrderByDiaSemanaAscHoraInicioAsc(sectorId);
+        log.debug("Listando horarios del sector ID: {}", sectorId);
+        return horarioAtencionRepository.findBySectorIdOrderByDiaSemanaAscHoraInicioAsc(sectorId);
     }
 
     @Override

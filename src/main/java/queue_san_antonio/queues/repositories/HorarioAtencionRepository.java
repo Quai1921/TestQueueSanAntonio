@@ -17,4 +17,8 @@ public interface HorarioAtencionRepository extends JpaRepository<HorarioAtencion
     // Horarios de un día específico
     @Query("SELECT h FROM HorarioAtencion h WHERE h.sector.id = :sectorId AND h.diaSemana = :diaSemana AND h.activo = true ORDER BY h.horaInicio")
     List<HorarioAtencion> findHorariosPorDia(@Param("sectorId") Long sectorId, @Param("diaSemana") java.time.DayOfWeek diaSemana);
+
+
+    // Agregar este método para obtener TODOS los horarios (activos e inactivos)
+    List<HorarioAtencion> findBySectorIdOrderByDiaSemanaAscHoraInicioAsc(Long sectorId);
 }
