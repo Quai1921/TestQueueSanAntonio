@@ -19,11 +19,20 @@ public class CiudadanoSummaryResponse {
     @JsonProperty("dni")
     private String dni;
 
-    @JsonProperty("nombreCompleto")
-    private String nombreCompleto;
+    @JsonProperty("nombre")
+    private String nombre;
+
+    @JsonProperty("apellido")
+    private String apellido;
 
     @JsonProperty("telefono")
     private String telefono;
+
+    @JsonProperty("direccion")
+    private String direccion;
+
+    @JsonProperty("observaciones")
+    private String observaciones;
 
     @JsonProperty("esPrioritario")
     private Boolean esPrioritario;
