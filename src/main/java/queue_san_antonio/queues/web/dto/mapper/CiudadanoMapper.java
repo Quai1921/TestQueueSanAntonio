@@ -30,10 +30,13 @@ public class CiudadanoMapper {
     public static void updateEntity(Ciudadano ciudadano, CiudadanoRequest request) {
         if (ciudadano == null || request == null) return;
 
+        ciudadano.setDni(request.getDni());
+
         ciudadano.setNombre(request.getNombre() != null ? request.getNombre().trim() : ciudadano.getNombre());
         ciudadano.setApellido(request.getApellido() != null ? request.getApellido().trim() : ciudadano.getApellido());
         ciudadano.setTelefono(request.getTelefono() != null ? request.getTelefono().trim() : ciudadano.getTelefono());
         ciudadano.setDireccion(request.getDireccion() != null ? request.getDireccion().trim() : ciudadano.getDireccion());
+
 
         if (request.getEsPrioritario() != null) {
             ciudadano.establecerPrioridad(
