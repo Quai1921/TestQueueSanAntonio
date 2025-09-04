@@ -1,0 +1,92 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.5.4'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'queue-san-antonio'
+version = '0.0.1-SNAPSHOT'
+description = 'Turn atention'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(24)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+    // Spring Boot Core
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // WebSockets para tiempo real (turnos en pantalla)
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+
+    // JWT - Agregar implementaciones faltantes
+    implementation "io.jsonwebtoken:jjwt-api:0.12.7"
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:0.12.7"
+    runtimeOnly "io.jsonwebtoken:jjwt-jackson:0.12.7"
+
+    // Base de datos
+    runtimeOnly 'org.postgresql:postgresql'
+//    runtimeOnly 'com.h2database:h2'
+
+    // Migraciones de BD
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-database-postgresql'
+
+    // Utilidades
+    implementation 'org.apache.commons:commons-lang3'
+    implementation 'org.apache.commons:commons-csv:1.10.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+
+    // Lombok (compilación + tests)
+    compileOnly 'org.projectlombok:lombok:1.18.38'
+    annotationProcessor 'org.projectlombok:lombok:1.18.38'
+    testCompileOnly 'org.projectlombok:lombok:1.18.38'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.38'
+
+    // Mapeo de objetos (Entity <-> DTO)
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
+    // Cache (para optimización)
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'org.ehcache:ehcache'
+
+    // Backblaze B2 SDK
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+
+    // Programación de tareas (para estadísticas automáticas)
+    implementation 'org.springframework.boot:spring-boot-starter-quartz'
+
+    // Logging mejorado
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+
+    // Development
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    // Testing
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.testcontainers:postgresql'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Testing de WebSockets
+    testImplementation 'org.springframework.boot:spring-boot-starter-websocket'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
