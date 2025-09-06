@@ -1,8 +1,17 @@
 package queue_san_antonio.queues.services.impl;
 
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -18,8 +27,10 @@ import queue_san_antonio.queues.services.HorarioAtencionService;
 import queue_san_antonio.queues.services.TurnoService;
 import queue_san_antonio.queues.services.realtime.SseTurnosService;
 import queue_san_antonio.queues.utils.DiaSemanaUtil;
+import jakarta.persistence.criteria.*;
 
 import java.time.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -38,6 +49,9 @@ public class TurnoServiceImpl implements TurnoService {
     private final EstadisticaTurnoService estadisticaTurnoService;
     private final HorarioAtencionService horarioAtencionService;
     private final SseTurnosService sseTurnosService;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
 
 
@@ -525,6 +539,7 @@ public class TurnoServiceImpl implements TurnoService {
         return turnoRepository.findByCiudadanoIdOrderByFechaHoraGeneracionDesc(ciudadanoId);
     }
 
+
     @Override
     @Transactional(readOnly = true)
     public List<Turno> listarTurnosPendientesCiudadano(Long ciudadanoId) {
@@ -580,6 +595,106 @@ public class TurnoServiceImpl implements TurnoService {
 
         return nuevoCodigo;
     }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Turno> listarTurnosConFiltros(int limite, int offset, LocalDate fecha, Long sectorId) {
+        log.debug("Listando turnos con filtros - límite: {}, offset: {}, fecha: {}, sectorId: {}",
+                limite, offset, fecha, sectorId);
+
+        // Validar parámetros
+        if (limite <= 0 || limite > 500) {
+            throw new IllegalArgumentException("El límite debe estar entre 1 y 500");
+        }
+        if (offset < 0) {
+            throw new IllegalArgumentException("El offset no puede ser negativo");
+        }
+
+        try {
+            // Convertir fecha a rango si se proporciona
+            LocalDateTime fechaInicio = null;
+            LocalDateTime fechaFin = null;
+
+            if (fecha != null) {
+                fechaInicio = fecha.atStartOfDay();
+                fechaFin = fecha.atTime(LocalTime.MAX);
+            }
+
+            // Crear Pageable
+            Pageable pageable = PageRequest.of(offset / limite, limite);
+
+            // Usar repository
+            Page<Turno> page = turnoRepository.findTurnosConFiltros(fechaInicio, fechaFin, sectorId, pageable);
+            List<Turno> turnos = page.getContent();
+
+            log.debug("Se encontraron {} turnos con los filtros aplicados", turnos.size());
+            return turnos;
+
+        } catch (Exception e) {
+            log.error("Error listando turnos con filtros: {}", e.getMessage(), e);
+            throw new RuntimeException("Error al listar turnos con filtros", e);
+        }
+    }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public long contarTurnosConFiltros(LocalDate fecha, Long sectorId) {
+        log.debug("Contando turnos con filtros - fecha: {}, sectorId: {}", fecha, sectorId);
+
+        try {
+            // Convertir fecha a rango si se proporciona
+            LocalDateTime fechaInicio = null;
+            LocalDateTime fechaFin = null;
+
+            if (fecha != null) {
+                fechaInicio = fecha.atStartOfDay();
+                fechaFin = fecha.atTime(LocalTime.MAX);
+            }
+
+            // Usar repository
+            long count = turnoRepository.countTurnosConFiltros(fechaInicio, fechaFin, sectorId);
+
+            log.debug("Total de turnos que cumplen los filtros: {}", count);
+            return count;
+
+        } catch (Exception e) {
+            log.error("Error contando turnos con filtros: {}", e.getMessage(), e);
+            throw new RuntimeException("Error al contar turnos con filtros", e);
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Turno> listarTodos(int limite) {
+        log.debug("Listando todos los turnos - límite: {}", limite);
+
+        // Validar límite
+        if (limite <= 0 || limite > 1000) {
+            throw new IllegalArgumentException("El límite debe estar entre 1 y 1000");
+        }
+
+        try {
+            // Crear Pageable solo con el límite
+            Pageable pageable = PageRequest.of(0, limite);
+
+            // Usar repository
+            List<Turno> turnos = turnoRepository.findTurnosRecientes(pageable);
+
+            log.debug("Se listaron {} turnos", turnos.size());
+            return turnos;
+
+        } catch (Exception e) {
+            log.error("Error listando todos los turnos: {}", e.getMessage(), e);
+            throw new RuntimeException("Error al listar todos los turnos", e);
+        }
+    }
+
+
+
+
+
 
 
     // Métodos de validación privados

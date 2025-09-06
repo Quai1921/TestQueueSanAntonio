@@ -1,21 +1,18 @@
 package queue_san_antonio.queues.web.controllers;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import queue_san_antonio.queues.models.Empleado;
-import queue_san_antonio.queues.models.HistorialTurno;
-import queue_san_antonio.queues.models.Turno;
-import queue_san_antonio.queues.services.EmpleadoService;
-import queue_san_antonio.queues.services.HistorialTurnoService;
-import queue_san_antonio.queues.services.TurnoService;
+import queue_san_antonio.queues.models.*;
+import queue_san_antonio.queues.services.*;
 import queue_san_antonio.queues.services.impl.HistorialTurnoServiceImpl;
 import queue_san_antonio.queues.web.dto.common.ApiResponseWrapper;
 import queue_san_antonio.queues.web.dto.historial.*;
@@ -24,6 +21,7 @@ import queue_san_antonio.queues.web.exceptions.custom.ResourceNotFoundException;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 
 //Controlador REST para la gestión del historial y auditoría de turnos
@@ -39,7 +37,10 @@ public class HistorialTurnoController {
     private final HistorialTurnoService historialTurnoService;
     private final TurnoService turnoService;
     private final EmpleadoService empleadoService;
-    private final HistorialTurnoServiceImpl historialTurnoServiceImpl; // Para métodos adicionales
+    private final HistorialTurnoServiceImpl historialTurnoServiceImpl;
+
+    private final CiudadanoService ciudadanoService;
+    private final SectorService sectorService;
 
     // ==========================================
     // ENDPOINTS DE CONSULTA DE HISTORIAL
@@ -451,5 +452,199 @@ public class HistorialTurnoController {
                         String.format("Resumen de actividad de empleados para %s (%d acciones)",
                                 hoy, historial.size()))
         );
+    }
+
+
+
+
+
+
+
+
+    /**
+     * Obtiene el historial de un ciudadano por DNI
+     * GET /api/historial/ciudadano/{dni}?limite=100
+     */
+    @GetMapping("/ciudadano/{dni}")
+    @PreAuthorize("hasAnyRole('RESPONSABLE_SECTOR', 'ADMIN')")
+    public ResponseEntity<ApiResponseWrapper<List<HistorialSummaryResponse>>> obtenerHistorialCiudadano(
+            @PathVariable @Pattern(regexp = "^[0-9]{7,8}$", message = "El DNI debe tener entre 7 y 8 dígitos") String dni,
+            @RequestParam(defaultValue = "100") @Min(1) @Max(500) int limite) {
+
+        log.debug("Obteniendo historial del ciudadano DNI: {} (límite: {})", dni, limite);
+
+        try {
+            // Buscar ciudadano
+            Ciudadano ciudadano = ciudadanoService.buscarPorDni(dni)
+                    .orElseThrow(() -> ResourceNotFoundException.ciudadano(dni));
+
+            // Obtener turnos del ciudadano
+            List<Turno> turnos = turnoService.listarTurnosCiudadano(ciudadano.getId());
+
+            // Obtener historial de todos los turnos del ciudadano
+            List<HistorialTurno> historialCompleto = new ArrayList<>();
+            for (Turno turno : turnos) {
+                List<HistorialTurno> historialTurno = historialTurnoService.listarPorTurno(turno.getId());
+                historialCompleto.addAll(historialTurno);
+            }
+
+            // Ordenar por fecha descendente y limitar
+            List<HistorialTurno> historialLimitado = historialCompleto.stream()
+                    .sorted((h1, h2) -> h2.getFechaHora().compareTo(h1.getFechaHora()))
+                    .limit(limite)
+                    .toList();
+
+            List<HistorialSummaryResponse> response = HistorialTurnoMapper.toSummaryResponseList(historialLimitado);
+
+            return ResponseEntity.ok(
+                    ApiResponseWrapper.success(response,
+                            String.format("Se encontraron %d acciones en el historial de %s",
+                                    response.size(), ciudadano.getNombreCompleto()))
+            );
+
+        } catch (Exception e) {
+            log.error("Error obteniendo historial del ciudadano {}: {}", dni, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ApiResponseWrapper.error("Error obteniendo historial del ciudadano", "INTERNAL_ERROR")
+            );
+        }
+    }
+
+    /**
+     * Obtiene métricas rápidas del historial de hoy
+     * GET /api/historial/metricas/hoy
+     */
+    @GetMapping("/metricas/hoy")
+    @PreAuthorize("hasAnyRole('RESPONSABLE_SECTOR', 'ADMIN')")
+    public ResponseEntity<ApiResponseWrapper<MetricasHistorialResponse>> obtenerMetricasHoy() {
+
+        log.debug("Obteniendo métricas del historial de hoy");
+
+        try {
+            LocalDate hoy = LocalDate.now(ZoneId.of("America/Argentina/Cordoba"));
+
+            // Obtener acciones del día
+            List<HistorialTurno> accionesHoy = historialTurnoService.listarUltimasAcciones(2000)
+                    .stream()
+                    .filter(h -> h.getFechaHora().toLocalDate().equals(hoy))
+                    .toList();
+
+            // Calcular métricas
+            long totalAcciones = accionesHoy.size();
+            long turnosGenerados = accionesHoy.stream()
+                    .filter(h -> h.getAccion() == AccionTurno.GENERADO)
+                    .count();
+            long turnosLlamados = accionesHoy.stream()
+                    .filter(h -> h.getAccion() == AccionTurno.LLAMADO)
+                    .count();
+            long turnosFinalizados = accionesHoy.stream()
+                    .filter(h -> h.getAccion() == AccionTurno.FINALIZADA_ATENCION)
+                    .count();
+            long redirecciones = accionesHoy.stream()
+                    .filter(HistorialTurno::esRedireccion)
+                    .count();
+            long ausentes = accionesHoy.stream()
+                    .filter(h -> h.getAccion() == AccionTurno.MARCADO_AUSENTE)
+                    .count();
+
+            // Empleados activos hoy
+            long empleadosActivos = accionesHoy.stream()
+                    .map(h -> h.getEmpleado().getId())
+                    .distinct()
+                    .count();
+
+            MetricasHistorialResponse response = MetricasHistorialResponse.builder()
+                    .fecha(hoy)
+                    .totalAcciones(totalAcciones)
+                    .turnosGenerados(turnosGenerados)
+                    .turnosLlamados(turnosLlamados)
+                    .turnosFinalizados(turnosFinalizados)
+                    .redirecciones(redirecciones)
+                    .ausentes(ausentes)
+                    .empleadosActivos(empleadosActivos)
+                    .build();
+
+            return ResponseEntity.ok(
+                    ApiResponseWrapper.success(response,
+                            String.format("Métricas del día %s generadas exitosamente", hoy))
+            );
+
+        } catch (Exception e) {
+            log.error("Error obteniendo métricas de hoy: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ApiResponseWrapper.error("Error obteniendo métricas", "INTERNAL_ERROR")
+            );
+        }
+    }
+
+    /**
+     * Compara actividad entre dos sectores en una fecha
+     * GET /api/historial/comparar-sectores/{sectorId1}/{sectorId2}?fecha=2025-09-06
+     */
+    @GetMapping("/comparar-sectores/{sectorId1}/{sectorId2}")
+    @PreAuthorize("hasAnyRole('RESPONSABLE_SECTOR', 'ADMIN')")
+    public ResponseEntity<ApiResponseWrapper<ComparacionSectoresResponse>> compararSectores(
+            @PathVariable Long sectorId1,
+            @PathVariable Long sectorId2,
+            @RequestParam(defaultValue = "#{T(java.time.LocalDate).now()}")
+            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fecha) {
+
+        log.debug("Comparando actividad entre sectores {} y {} para fecha: {}", sectorId1, sectorId2, fecha);
+
+        try {
+            // Validar sectores
+            Sector sector1 = sectorService.buscarPorId(sectorId1)
+                    .orElseThrow(() -> ResourceNotFoundException.sector(sectorId1));
+            Sector sector2 = sectorService.buscarPorId(sectorId2)
+                    .orElseThrow(() -> ResourceNotFoundException.sector(sectorId2));
+
+            // Obtener turnos de ambos sectores en la fecha
+            List<Turno> turnosSector1 = turnoService.listarTurnosDelDia(sectorId1, fecha);
+            List<Turno> turnosSector2 = turnoService.listarTurnosDelDia(sectorId2, fecha);
+
+            // Crear métricas de comparación
+            MetricasSectorResponse metricasSector1 = crearMetricasSector(sector1, turnosSector1);
+            MetricasSectorResponse metricasSector2 = crearMetricasSector(sector2, turnosSector2);
+
+            ComparacionSectoresResponse response = ComparacionSectoresResponse.builder()
+                    .fecha(fecha)
+                    .sector1(metricasSector1)
+                    .sector2(metricasSector2)
+                    .build();
+
+            return ResponseEntity.ok(
+                    ApiResponseWrapper.success(response,
+                            String.format("Comparación entre sectores %s y %s para %s",
+                                    sector1.getCodigo(), sector2.getCodigo(), fecha))
+            );
+
+        } catch (Exception e) {
+            log.error("Error comparando sectores: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ApiResponseWrapper.error("Error comparando sectores", "INTERNAL_ERROR")
+            );
+        }
+    }
+
+    // ==========================================
+// MÉTODOS HELPER PRIVADOS
+// ==========================================
+
+    private MetricasSectorResponse crearMetricasSector(Sector sector, List<Turno> turnos) {
+        return MetricasSectorResponse.builder()
+                .sectorId(sector.getId())
+                .sectorCodigo(sector.getCodigo())
+                .sectorNombre(sector.getNombre())
+                .totalTurnos((long) turnos.size())
+                .turnosFinalizados(turnos.stream()
+                        .filter(t -> t.getEstado() == EstadoTurno.FINALIZADO)
+                        .count())
+                .turnosAusentes(turnos.stream()
+                        .filter(t -> t.getEstado() == EstadoTurno.AUSENTE)
+                        .count())
+                .turnosRedirigidos(turnos.stream()
+                        .filter(t -> t.getEstado() == EstadoTurno.REDIRIGIDO)
+                        .count())
+                .build();
     }
 }

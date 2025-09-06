@@ -45,4 +45,9 @@ public interface TurnoService {
     // Generación de códigos
     String generarCodigoTurno(String codigoSector, LocalDate fecha);
 
+    // Métodos para historial
+    List<Turno> listarTurnosConFiltros(int limite, int offset, LocalDate fecha, Long sectorId);
+    long contarTurnosConFiltros(LocalDate fecha, Long sectorId);
+    List<Turno> listarTodos(int limite);
+
 }

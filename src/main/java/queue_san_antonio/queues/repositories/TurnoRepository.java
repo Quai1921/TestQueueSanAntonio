@@ -1,8 +1,9 @@
 package queue_san_antonio.queues.repositories;
 
-import jakarta.persistence.LockModeType;
+
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -96,5 +97,40 @@ public interface TurnoRepository extends JpaRepository<Turno, Long> {
             @Param("excluir") Collection<EstadoTurno> excluir
     );
 
+
+
+
+
+    /**
+     * Lista turnos más recientes sin filtros (método simple)
+     */
+    @Query("SELECT t FROM Turno t ORDER BY t.fechaHoraGeneracion DESC")
+    List<Turno> findTurnosRecientes(org.springframework.data.domain.Pageable pageable);
+
+    /**
+     * Busca turnos con filtros opcionales usando paginación
+     */
+    @Query("SELECT t FROM Turno t WHERE " +
+            "(:fechaInicio IS NULL OR t.fechaHoraGeneracion >= :fechaInicio) AND " +
+            "(:fechaFin IS NULL OR t.fechaHoraGeneracion <= :fechaFin) AND " +
+            "(:sectorId IS NULL OR t.sector.id = :sectorId) " +
+            "ORDER BY t.fechaHoraGeneracion DESC")
+    org.springframework.data.domain.Page<Turno> findTurnosConFiltros(
+            @Param("fechaInicio") LocalDateTime fechaInicio,
+            @Param("fechaFin") LocalDateTime fechaFin,
+            @Param("sectorId") Long sectorId,
+            org.springframework.data.domain.Pageable pageable);
+
+    /**
+     * Cuenta turnos que cumplen los filtros
+     */
+    @Query("SELECT COUNT(t) FROM Turno t WHERE " +
+            "(:fechaInicio IS NULL OR t.fechaHoraGeneracion >= :fechaInicio) AND " +
+            "(:fechaFin IS NULL OR t.fechaHoraGeneracion <= :fechaFin) AND " +
+            "(:sectorId IS NULL OR t.sector.id = :sectorId)")
+    long countTurnosConFiltros(
+            @Param("fechaInicio") LocalDateTime fechaInicio,
+            @Param("fechaFin") LocalDateTime fechaFin,
+            @Param("sectorId") Long sectorId);
 
 }

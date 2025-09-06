@@ -2,10 +2,13 @@ package queue_san_antonio.queues.web.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -21,13 +24,7 @@ import queue_san_antonio.queues.services.SectorService;
 import queue_san_antonio.queues.services.TurnoService;
 import queue_san_antonio.queues.web.dto.common.ApiResponseWrapper;
 import queue_san_antonio.queues.web.dto.mapper.TurnoMapper;
-import queue_san_antonio.queues.web.dto.turno.FinalizarTurnoRequest;
-import queue_san_antonio.queues.web.dto.turno.GenerarTurnoRequest;
-import queue_san_antonio.queues.web.dto.turno.LlamarTurnoRequest;
-import queue_san_antonio.queues.web.dto.turno.MarcarAusenteRequest;
-import queue_san_antonio.queues.web.dto.turno.RedirigirTurnoRequest;
-import queue_san_antonio.queues.web.dto.turno.TurnoResponse;
-import queue_san_antonio.queues.web.dto.turno.TurnoSummaryResponse;
+import queue_san_antonio.queues.web.dto.turno.*;
 import queue_san_antonio.queues.web.exceptions.custom.ResourceNotFoundException;
 
 import java.time.LocalDate;
@@ -494,6 +491,109 @@ public class TurnoController {
     }
 
 
+
+
+    /**
+     * Lista turnos con paginación y filtros opcionales
+     * GET /api/turnos/listar?limite=50&offset=0&fecha=2025-09-06&sectorId=1
+     */
+    @GetMapping("/listar")
+    @PreAuthorize("hasAnyRole('OPERADOR', 'RESPONSABLE_SECTOR', 'ADMIN')")
+    public ResponseEntity<ApiResponseWrapper<TurnosListadoResponse>> listarTurnosConFiltros(
+            @RequestParam(defaultValue = "50") @Min(1) @Max(200) int limite,
+            @RequestParam(defaultValue = "0") @Min(0) int offset,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fecha,
+            @RequestParam(required = false) Long sectorId) {
+
+        log.debug("Listando turnos - límite: {}, offset: {}, fecha: {}, sectorId: {}",
+                limite, offset, fecha, sectorId);
+
+        try {
+            // Validar sector si se proporciona
+            if (sectorId != null) {
+                sectorService.buscarPorId(sectorId)
+                        .orElseThrow(() -> ResourceNotFoundException.sector(sectorId));
+            }
+
+            // Obtener turnos y total
+            List<Turno> turnos = turnoService.listarTurnosConFiltros(limite, offset, fecha, sectorId);
+            long total = turnoService.contarTurnosConFiltros(fecha, sectorId);
+
+            // Mapear respuesta
+            List<TurnoSummaryResponse> turnosResponse = TurnoMapper.toSummaryResponseList(turnos);
+
+            // Crear respuesta con metadatos de paginación
+            TurnosListadoResponse response = TurnosListadoResponse.builder()
+                    .turnos(turnosResponse)
+                    .total(total)
+                    .limite(limite)
+                    .offset(offset)
+                    .hasNext(offset + limite < total)
+                    .hasPrevious(offset > 0)
+                    .totalPaginas((int) Math.ceil((double) total / limite))
+                    .paginaActual((offset / limite) + 1)
+                    .filtros(TurnosListadoResponse.FiltrosAplicados.builder()
+                            .fecha(fecha)
+                            .sectorId(sectorId)
+                            .build())
+                    .build();
+
+            String mensaje = construirMensajeListado(turnos.size(), total, fecha, sectorId);
+
+            return ResponseEntity.ok(
+                    ApiResponseWrapper.success(response, mensaje)
+            );
+
+        } catch (IllegalArgumentException e) {
+            log.warn("Parámetros inválidos para listar turnos: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(
+                    ApiResponseWrapper.error(e.getMessage(), "INVALID_PARAMETERS")
+            );
+        } catch (Exception e) {
+            log.error("Error listando turnos: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ApiResponseWrapper.error("Error interno al listar turnos", "INTERNAL_ERROR")
+            );
+        }
+    }
+
+    /**
+     * Lista todos los turnos recientes (endpoint simple sin filtros)
+     * GET /api/turnos/todos?limite=100
+     */
+    @GetMapping("/todos")
+    @PreAuthorize("hasAnyRole('OPERADOR', 'RESPONSABLE_SECTOR', 'ADMIN')")
+    public ResponseEntity<ApiResponseWrapper<List<TurnoSummaryResponse>>> listarTodosTurnos(
+            @RequestParam(defaultValue = "100") @Min(1) @Max(500) int limite) {
+
+        log.debug("Listando todos los turnos - límite: {}", limite);
+
+        try {
+            List<Turno> turnos = turnoService.listarTodos(limite);
+            List<TurnoSummaryResponse> response = TurnoMapper.toSummaryResponseList(turnos);
+
+            return ResponseEntity.ok(
+                    ApiResponseWrapper.success(response,
+                            String.format("Se listaron %d turnos (más recientes)", turnos.size()))
+            );
+
+        } catch (IllegalArgumentException e) {
+            log.warn("Parámetros inválidos para listar todos los turnos: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(
+                    ApiResponseWrapper.error(e.getMessage(), "INVALID_PARAMETERS")
+            );
+        } catch (Exception e) {
+            log.error("Error listando todos los turnos: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ApiResponseWrapper.error("Error interno al listar turnos", "INTERNAL_ERROR")
+            );
+        }
+    }
+
+
+
+
+
     // ==========================================
     // MÉTODOS HELPER PRIVADOS
     // ==========================================
@@ -579,5 +679,35 @@ public class TurnoController {
         }
 
         return ciudadano;
+    }
+
+
+    /**
+     * Construye mensaje descriptivo del listado
+     */
+    private String construirMensajeListado(int turnosEncontrados, long total, LocalDate fecha, Long sectorId) {
+        StringBuilder mensaje = new StringBuilder();
+
+        mensaje.append(String.format("Se encontraron %d", turnosEncontrados));
+
+        if (turnosEncontrados < total) {
+            mensaje.append(String.format(" de %d", total));
+        }
+
+        mensaje.append(" turnos");
+
+        // Agregar información de filtros aplicados
+        if (fecha != null || sectorId != null) {
+            mensaje.append(" (filtrado");
+            if (fecha != null) {
+                mensaje.append(String.format(" por fecha: %s", fecha));
+            }
+            if (sectorId != null) {
+                mensaje.append(String.format(" por sector ID: %d", sectorId));
+            }
+            mensaje.append(")");
+        }
+
+        return mensaje.toString();
     }
 }
