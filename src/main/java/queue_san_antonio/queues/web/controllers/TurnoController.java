@@ -13,10 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import queue_san_antonio.queues.models.Ciudadano;
-import queue_san_antonio.queues.models.Empleado;
-import queue_san_antonio.queues.models.Sector;
-import queue_san_antonio.queues.models.Turno;
+import queue_san_antonio.queues.models.*;
 import queue_san_antonio.queues.security.jwt.JwtService;
 import queue_san_antonio.queues.services.CiudadanoService;
 import queue_san_antonio.queues.services.EmpleadoService;
@@ -495,6 +492,7 @@ public class TurnoController {
                         String.format("El sector %s tiene %d turnos pendientes", sector.getCodigo(), count))
         );
     }
+
 
     // ==========================================
     // MÉTODOS HELPER PRIVADOS

@@ -32,7 +32,7 @@ public class EstadisticaTurnoController {
     // ======================================================
     // 1) DIARIO (hoy/fecha) - resumen o detalle
     // ======================================================
-    //
+    // prueba
     // Ejemplos:
     //  - GET /api/estadisticas/diario
     //  - GET /api/estadisticas/diario?fecha=2025-09-02
